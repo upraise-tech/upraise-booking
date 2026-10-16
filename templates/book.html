@@ -335,5 +335,17 @@
     el.textContent = calrsFormat12h(el.dataset.time);
   });
 })();
+
+  // Fill name and email from the link (Upraise Outreach's "Book a call") when the form is still empty.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    ['name', 'email'].forEach(function (k) {
+      var el = document.getElementById(k);
+      if (!el || el.value) return;
+      var v = q.get(k);
+      try { if (!v) v = sessionStorage.getItem('booking-prefill-' + k); } catch (e) {}
+      if (v) el.value = v.slice(0, 255);
+    });
+  })();
 </script>
 {% endblock %}

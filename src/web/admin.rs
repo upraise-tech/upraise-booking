@@ -464,6 +464,18 @@ pub(super) async fn admin_dashboard(
         .and_then(|w| w.display_name.clone())
         .unwrap_or_default();
     drop(meeting_cfg);
+    let booking_events_cfg =
+        super::booking_events::load_config(&state.pool, &state.secret_key).await;
+    let booking_events_url = booking_events_cfg
+        .as_ref()
+        .map(|c| c.url.clone())
+        .unwrap_or_default();
+    let booking_events_has_secret = booking_events_cfg
+        .as_ref()
+        .map(|c| !c.secret.is_empty())
+        .unwrap_or(false);
+    let (booking_events_last_ok, booking_events_last_error, booking_events_waiting) =
+        super::booking_events::status(&state.pool).await;
 
     Html(
         tmpl.render(context! {
@@ -539,6 +551,12 @@ pub(super) async fn admin_dashboard(
             meeting_webhook_auth_mode => meeting_webhook_auth_mode,
             meeting_webhook_has_secret => meeting_webhook_has_secret,
             meeting_webhook_display_name => meeting_webhook_display_name,
+            booking_events_configured => booking_events_cfg.is_some(),
+            booking_events_url => booking_events_url,
+            booking_events_has_secret => booking_events_has_secret,
+            booking_events_last_ok => booking_events_last_ok.unwrap_or_default(),
+            booking_events_last_error => booking_events_last_error.unwrap_or_default(),
+            booking_events_waiting => booking_events_waiting,
             has_logo => state.data_dir.join("logo.png").exists(),
             company_link => get_company_link(&state.pool).await.unwrap_or_default(),
             current_theme => get_theme_name(&state.pool).await,
@@ -2131,6 +2149,67 @@ pub(super) async fn admin_update_meeting_webhook(
         meeting::load_config(&state.pool, &state.secret_key).await;
 
     tracing::info!(admin = %_admin.user.email, "admin: meeting webhook config updated");
+    Redirect::to("/dashboard/admin").into_response()
+}
+
+#[derive(Deserialize)]
+pub(super) struct AdminBookingEventsForm {
+    _csrf: Option<String>,
+    booking_events_url: Option<String>,
+    booking_events_secret: Option<String>,
+}
+
+pub(super) async fn admin_update_booking_events(
+    State(state): State<Arc<AppState>>,
+    _admin: crate::auth::AdminUser,
+    headers: HeaderMap,
+    Form(form): Form<AdminBookingEventsForm>,
+) -> impl IntoResponse {
+    if let Err(resp) = verify_csrf_token(&headers, &form._csrf) {
+        return resp;
+    }
+    let url = form
+        .booking_events_url
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
+    if let Some(u) = &url {
+        let l = u.to_ascii_lowercase();
+        if !(l.starts_with("https://") || l.starts_with("http://")) {
+            return Redirect::to("/dashboard/admin").into_response();
+        }
+    }
+    let was_on = super::booking_events::load_config(&state.pool, &state.secret_key)
+        .await
+        .is_some();
+    // Empty secret field keeps the stored one, as for the other admin secrets.
+    let secret = form.booking_events_secret.filter(|s| !s.trim().is_empty());
+    let result = if let Some(secret) = secret {
+        let encrypted = match crate::crypto::encrypt_value(&state.secret_key, secret.trim()) {
+            Ok(s) => s,
+            Err(e) => return internal_error_response("encrypt booking events secret", &e),
+        };
+        sqlx::query(
+            "UPDATE auth_config SET booking_events_url = ?, booking_events_secret = ?, updated_at = datetime('now') WHERE id = 'singleton'",
+        )
+        .bind(&url)
+        .bind(&encrypted)
+        .execute(&state.pool)
+        .await
+    } else {
+        sqlx::query(
+            "UPDATE auth_config SET booking_events_url = ?, updated_at = datetime('now') WHERE id = 'singleton'",
+        )
+        .bind(&url)
+        .execute(&state.pool)
+        .await
+    };
+    if let Err(e) = result {
+        tracing::error!(error = %e, "failed to save booking events config");
+    } else if url.is_some() && !was_on {
+        // First time on: past bookings count as already reported; upcoming ones go out on the next pass.
+        super::booking_events::baseline_past(&state.pool).await;
+    }
+    tracing::info!(admin = %_admin.user.email, enabled = url.is_some(), "admin: booking events config updated");
     Redirect::to("/dashboard/admin").into_response()
 }
 

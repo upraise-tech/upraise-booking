@@ -641,6 +641,29 @@ document.querySelectorAll('input[type="color"]').forEach(function(picker) {
   </form>
 </div>
 
+<!-- Booking events for Upraise Outreach (Cal.com webhook format) -->
+<div class="card">
+  <h2>{{ t("admin-booking-events") }}</h2>
+  <div style="margin-bottom: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+    {{ t("admin-status") }} {% if booking_events_configured %}<strong style="color: var(--success);">{{ t("admin-status-enabled") }}</strong>{% else %}<span style="color: var(--text-muted);">{{ t("admin-status-disabled") }}</span>{% endif %}
+    {% if booking_events_configured and booking_events_last_ok %}&middot; <span style="color: var(--text-muted);">{{ t("admin-booking-events-last-ok", when=booking_events_last_ok) }} UTC</span>{% endif %}
+    {% if booking_events_configured and booking_events_waiting > 0 %}<br><span style="color: var(--danger, #dc2626);">{{ t("admin-booking-events-failing", count=booking_events_waiting, error=booking_events_last_error) }}</span>{% endif %}
+  </div>
+  <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.75rem;">{{ t("admin-booking-events-help") }}</p>
+  <form method="post" action="/dashboard/admin/booking-events">
+    <div class="form-group">
+      <label>{{ t("admin-booking-events-url") }}</label>
+      <input type="url" name="booking_events_url" value="{{ booking_events_url }}" placeholder="https://outreach.upraise.uk/api/v1/integrations/inbound/cal-com/…">
+    </div>
+    <div class="form-group">
+      <label>{{ t("admin-signing-key") }} <span class="hint">{% if booking_events_has_secret %}{{ t("admin-keep-current-set-hint") }}{% else %}{{ t("admin-keep-current-hint") }}{% endif %}</span></label>
+      <input type="password" name="booking_events_secret" value="" placeholder="{{ t('admin-keep-unchanged') }}" autocomplete="new-password">
+    </div>
+    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">{{ t("admin-booking-events-disable-help") }}</p>
+    <button type="submit" class="slot-btn" style="cursor: pointer; font-weight: 600; color: var(--accent); border-color: var(--accent);">{{ t("admin-save-booking-events") }}</button>
+  </form>
+</div>
+
 <!-- SMTP settings -->
 <div class="card">
   <h2>{{ t("admin-smtp") }}</h2>

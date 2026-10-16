@@ -941,6 +941,17 @@
   var basePath = decHtml("{{ base }}");
   var guestTz = decHtml("{{ guest_tz }}");
   var inviteToken = decHtml("{{ invite_token | default(value='') }}");
+  // Name and email from a "Book a call" link (Upraise Outreach adds ?name=&email=): carried to the booking form,
+  // and kept for this tab so they survive month navigation.
+  var prefillSuffix = (function () {
+    var q = new URLSearchParams(location.search), out = '';
+    ['name', 'email'].forEach(function (k) {
+      var v = q.get(k);
+      try { if (v) sessionStorage.setItem('booking-prefill-' + k, v); else v = sessionStorage.getItem('booking-prefill-' + k); } catch (e) {}
+      if (v) out += '&' + k + '=' + encodeURIComponent(v);
+    });
+    return out;
+  })();
   var rescheduleBase = decHtml("{{ reschedule_base | default('') }}");
   // can_book is true when the viewer can actually book (public event, valid
   // booking invite, or rescheduling). When false, slot pills render as
@@ -1142,6 +1153,7 @@
       }
       if (guestTz) href += '&tz=' + encodeURIComponent(guestTz);
       if (inviteToken) href += '&invite=' + encodeURIComponent(inviteToken);
+      href += prefillSuffix;
       href += embedSuffix;
       if (canBook) {
         html += '<a href="' + href + '" class="slot-pill">' + formatTime(s.start) + '</a>';
