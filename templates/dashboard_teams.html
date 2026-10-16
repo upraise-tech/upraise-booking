@@ -1,5 +1,5 @@
 {% extends "dashboard_base.html" %}
-{% block title %}{{ t("teams-page-title") }} — calrs{% endblock %}
+{% block title %}{{ t("teams-page-title") }} — Upraise Booking{% endblock %}
 {% block dashboard_content %}
 <div class="card">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -47,7 +47,7 @@
     {% endfor %}
   {% else %}
     <div class="empty" style="padding: 2rem 1rem;">
-      <div class="empty-icon">&#128101;</div>
+      <div class="empty-icon"><svg class="up-i up-i-users" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
       <div class="empty-text">{{ t("teams-empty") }}{% if is_admin %} {{ t("teams-empty-admin", link='<a href="/dashboard/teams/new" style="color: var(--accent); text-decoration: none;">' ~ (t("teams-empty-admin-link-label") | escape) ~ '</a>') | safe }}{% endif %}</div>
       {% if not is_admin %}
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">{{ t("teams-empty-member") }}</p>

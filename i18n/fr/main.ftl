@@ -171,7 +171,7 @@ action-error-page-title = Erreur d'action sur la réservation
 
 # Host-initiated reschedule (booking_host_reschedule.html)
 
-host-resched-page-title = Reprogrammer la réservation — calrs
+host-resched-page-title = Reprogrammer la réservation — Upraise Booking
 host-resched-heading = Reprogrammer la réservation
 host-resched-subtitle = Cela enverra à { $guest } un e-mail lui demandant de choisir un nouveau créneau.
 host-resched-currently = Actuellement :
@@ -235,7 +235,7 @@ common-format-long-date = { $weekday } { $day } { $month } { $year }
 
 # Email signatures and shared bits (src/email.rs)
 
-email-signature = — calrs
+email-signature = — Upraise
 email-action-reschedule = Reprogrammer
 email-action-cancel-booking = Annuler la réservation
 
@@ -456,7 +456,7 @@ sources-reconnect-title = Relancer le processus de consentement Google
 sources-edit = Modifier
 sources-remove = Supprimer
 sources-remove-confirm = Supprimer la source « { $name } » ? Tous les événements synchronisés depuis cette source seront effacés.
-sources-no-write-calendar = Aucun agenda d'écriture sélectionné. Les réservations confirmées restent dans calrs et ne sont pas envoyées vers cet agenda. Choisissez-en un ci-dessous pour activer l'écriture.
+sources-no-write-calendar = Aucun agenda d'écriture sélectionné. Les réservations confirmées restent dans Upraise Booking et ne sont pas envoyées vers cet agenda. Choisissez-en un ci-dessous pour activer l'écriture.
 sources-write-bookings-to = Écrire les réservations dans :
 sources-write-none = Aucun (ne pas écrire)
 sources-empty = Aucune source d'agenda connectée. { $link } pour vérifier les disponibilités.
@@ -538,7 +538,7 @@ settings-error-public-page-language = Choisissez une langue valide pour les page
 settings-dynamic-group = Autoriser les autres à m'inclure dans les liens de groupe dynamiques
 settings-dynamic-group-help = Une fois activé, d'autres utilisateurs peuvent créer des URL de réunion collective ponctuelles qui vous incluent (ex. { $example }).
 settings-lend-resource = Prêter mon accès agenda pour les réservations de ressources
-settings-lend-resource-help = Lorsqu'une réservation doit réserver une ressource partagée (laboratoire de démo, salle de réunion) accessible en écriture par votre compte agenda, autoriser calrs à utiliser vos identifiants enregistrés pour cette écriture.
+settings-lend-resource-help = Lorsqu'une réservation doit réserver une ressource partagée (laboratoire de démo, salle de réunion) accessible en écriture par votre compte agenda, autoriser Upraise Booking à utiliser vos identifiants enregistrés pour cette écriture.
 settings-default-availability = Disponibilité par défaut
 settings-default-availability-help = Vos horaires de travail par défaut. Utilisés pour les liens de groupe dynamiques lorsque d'autres vous incluent dans une réunion.
 settings-copy-to-all = Copier sur tous les jours
@@ -555,7 +555,7 @@ settings-theme-dark = Sombre
 
 login-page-title = Connexion
 login-heading = Connexion
-login-subtitle = Connectez-vous à votre compte calrs
+login-subtitle = Connectez-vous à votre compte Upraise Booking
 login-sso = Se connecter avec le SSO
 login-or = ou
 login-email = E-mail
@@ -568,7 +568,7 @@ login-register-link = Inscrivez-vous
 
 register-page-title = Inscription
 register-heading = Créer un compte
-register-subtitle = Créez un nouveau compte calrs
+register-subtitle = Créez un nouveau compte Upraise Booking
 register-domains-limited = L'inscription est réservée à : { $domains }
 register-name = Nom
 register-name-placeholder = Votre nom
@@ -601,7 +601,7 @@ source-test-heading = Test de connexion
 source-write-page-title = Configurer l'écriture dans l'agenda
 source-write-back = Retour au tableau de bord
 source-write-heading = Où enregistrer les réservations ?
-source-write-help = Lorsqu'une personne réserve une réunion avec vous, calrs peut créer automatiquement l'événement dans votre agenda. Choisissez l'agenda dans lequel écrire les réservations pour { $name }.
+source-write-help = Lorsqu'une personne réserve une réunion avec vous, Upraise Booking peut créer automatiquement l'événement dans votre agenda. Choisissez l'agenda dans lequel écrire les réservations pour { $name }.
 source-write-save = Enregistrer
 source-write-skip = Passer pour l'instant
 source-write-sync-results = Résultats de la synchronisation
@@ -741,7 +741,7 @@ source-form-title-add = Ajouter un agenda
 source-form-heading-edit = Modifier la source d'agenda
 source-form-heading-add = Connecter un agenda
 source-form-subtitle-edit = Mettez à jour la connexion. Laissez le mot de passe vide pour conserver l'actuel. Après avoir changé l'URL ou le nom d'utilisateur, lancez une synchronisation pour rafraîchir la liste des agendas détectés.
-source-form-subtitle-add = Connectez un serveur CalDAV ou Microsoft Exchange (EWS) pour que calrs puisse vérifier vos disponibilités lors des réservations.
+source-form-subtitle-add = Connectez un serveur CalDAV ou Microsoft Exchange (EWS) pour que Upraise Booking puisse vérifier vos disponibilités lors des réservations.
 source-form-backend = Backend
 source-form-preset = Préréglage
 source-form-connect-google = Se connecter avec Google
@@ -758,7 +758,7 @@ source-form-skip-test = Ignorer le test de connexion
 source-form-skip-test-help = À utiliser si le test se bloque (fréquent sur certaines installations BlueMind/Zimbra). Vous pourrez tester la connexion plus tard.
 source-form-save = Enregistrer les modifications
 source-form-add = Ajouter la source d'agenda
-source-form-help-google-configured = Cliquez sur le bouton ci-dessous pour autoriser calrs à accéder à votre Google Agenda.
+source-form-help-google-configured = Cliquez sur le bouton ci-dessous pour autoriser Upraise Booking à accéder à votre Google Agenda.
 source-form-help-google-unconfigured = L'intégration Google Agenda n'est pas encore configurée. Demandez à votre administrateur de renseigner les identifiants OAuth2 Google dans le panneau d'administration.
 
 # Calendar source form: provider help (templates/source_form.html)
@@ -772,7 +772,7 @@ source-form-help-sogo = <strong>SOGo</strong> — Utilisez le point de terminais
 source-form-help-radicale = <strong>Radicale</strong> — Utilisez l'URL racine du serveur.<br> En général : <code>https://cal.example.com/</code>
 source-form-help-exchange = <strong>Microsoft Exchange (EWS)</strong>. Utilisez le point de terminaison SOAP :<br> <code>https://mail.example.com/EWS/Exchange.asmx</code><br> Le nom d'utilisateur est l'adresse de la boîte aux lettres ; le mot de passe doit accepter l'authentification HTTP Basic sur TLS (à activer sur une boîte de service si votre tenant l'a désactivée).<br> Pensez également à choisir <strong>Microsoft Exchange (EWS)</strong> dans la liste Backend ci-dessus.
 source-form-help-google = <strong>Google Agenda</strong> : connexion via OAuth2. Aucun mot de passe requis.<br>
-source-form-help-other = Saisissez l'<strong>URL racine DAV</strong> de votre serveur CalDAV, pas celle d'un agenda précis ni un lien public.<br> calrs découvrira automatiquement vos agendas via PROPFIND (RFC 4791).
+source-form-help-other = Saisissez l'<strong>URL racine DAV</strong> de votre serveur CalDAV, pas celle d'un agenda précis ni un lien public.<br> Upraise Booking découvrira automatiquement vos agendas via PROPFIND (RFC 4791).
 
 # Markdown editor toolbar, short labels (templates/team_form.html, templates/team_settings.html)
 
@@ -1110,7 +1110,7 @@ admin-no-teams = Aucune équipe pour le moment.
 admin-save-resource = Enregistrer la ressource
 admin-add-resource = Ajouter une ressource
 admin-jitsi = Jitsi (liens de réunion générés automatiquement)
-admin-jitsi-help = Lorsque le lieu d'un type d'événement est « Jitsi (salon généré automatiquement) », calrs construit une URL de salon pour chaque réservation en ajoutant le motif ci-dessous à votre URL de base Jitsi. Aucun appel d'API externe n'est nécessaire.
+admin-jitsi-help = Lorsque le lieu d'un type d'événement est « Jitsi (salon généré automatiquement) », Upraise Booking construit une URL de salon pour chaque réservation en ajoutant le motif ci-dessous à votre URL de base Jitsi. Aucun appel d'API externe n'est nécessaire.
 admin-display-name = Nom affiché
 admin-jitsi-display-name-placeholder = ex. Meet DYB
 admin-jitsi-display-name-help = Affiché aux invités sur le sélecteur de créneaux et le formulaire de réservation. « Visioconférence » par défaut si vide.
@@ -1169,7 +1169,7 @@ admin-sms-country = Indicatif pays par défaut
 admin-sms-country-hint = (utilisé quand un invité saisit un numéro local)
 admin-sms-daily-cap = Limite quotidienne
 admin-sms-daily-cap-hint = (messages par jour pour toute l'instance, 0 pour aucune limite)
-admin-sms-daily-cap-help = Au-delà de la limite, calrs cesse d'envoyer des SMS et continue les e-mails : une réservation n'échoue jamais parce que le budget SMS est épuisé.
+admin-sms-daily-cap-help = Au-delà de la limite, Upraise Booking cesse d'envoyer des SMS et continue les e-mails : une réservation n'échoue jamais parce que le budget SMS est épuisé.
 admin-save-sms = Enregistrer les paramètres SMS
 admin-send-test-sms = Envoyer un message de test à
 admin-send-test-sms-hint-check = (laissez vide pour vérifier seulement les identifiants)
@@ -1191,8 +1191,8 @@ admin-set-by-env = — défini par l'environnement ({ $var }), prioritaire sur l
 admin-google-help = Pour activer l'intégration Google Agenda, créez des identifiants OAuth2 sur la <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--accent);">Google Cloud Console</a>. Activez la <strong>CalDAV API</strong> (lecture des disponibilités et écriture des réservations) et la <strong>Google Calendar API</strong> (liens Google Meet), puis ajoutez { $redirect_uri } comme URI de redirection autorisée.
 admin-room-pattern-help = Jetons disponibles : <code>{"{"}username{"}"}</code> (hôte), <code>{"{"}event{"}"}</code> (identifiant du type d'événement), <code>{"{"}date{"}"}</code> (AAAAMMJJ), <code>{"{"}random{"}"}</code> (8 caractères). Par défaut : { $default }.
 admin-room-pattern-warning = Sans <code>{"{"}random{"}"}</code>, le nom du salon est prévisible : deux invités réservant le même type d'événement le même jour se retrouvent dans le même salon et peuvent voir la réunion de l'autre. Les salons fixes restent possibles (par exemple un salon personnel par hôte), mais n'activez cela qu'en connaissance de cause.
-admin-meeting-webhook-help = Lorsque le lieu d'un type d'événement est « Webhook (fournisseur personnalisé) », calrs envoie la réservation en POST à cette URL à la confirmation et attend en retour un corps JSON <code>{"{"}"url": "https://..."{"}"}</code>.
-admin-auth-hmac-help = Avec HMAC, calrs envoie <code>X-Calrs-Signature: sha256=&lt;hex&gt;</code> calculé sur le corps brut de la requête.
+admin-meeting-webhook-help = Lorsque le lieu d'un type d'événement est « Webhook (fournisseur personnalisé) », Upraise Booking envoie la réservation en POST à cette URL à la confirmation et attend en retour un corps JSON <code>{"{"}"url": "https://..."{"}"}</code>.
+admin-auth-hmac-help = Avec HMAC, Upraise Booking envoie <code>X-Calrs-Signature: sha256=&lt;hex&gt;</code> calculé sur le corps brut de la requête.
 admin-tls-none-warning = Ne choisissez <strong>Aucun</strong> que pour un relais sur cette machine qui ne propose pas STARTTLS, ou dont le certificat est auto-signé. Le courrier, et les éventuels identifiants, circulent alors en clair.
 admin-smtp-env-error-help = Corrigez les variables d'environnement <code>CALRS_SMTP_*</code>, ou supprimez-les pour gérer le SMTP depuis la base ici.
 admin-smtp-env-managed = Géré par <strong>variables d'environnement</strong> (prioritaires sur la base). Modifiez les variables <code>CALRS_SMTP_*</code> pour changer ce réglage, ou supprimez-les pour gérer le SMTP ici.
@@ -1394,16 +1394,16 @@ email-host-confirmed-message = Vous avez approuvé la réservation de { $guest }
 email-host-confirmed-footer = L'événement a été ajouté à votre agenda.
 email-host-sync-failure-subject = Action requise : agenda non mis à jour pour { $event } ({ $date })
 email-host-sync-failure-heading = Votre agenda n'a pas été mis à jour
-email-host-sync-failure-intro = Cette réservation a été déplacée, mais calrs n'a pas pu mettre à jour l'événement dans votre agenda Google. L'invité a le nouvel horaire ; votre agenda affiche toujours l'ancien.
+email-host-sync-failure-intro = Cette réservation a été déplacée, mais Upraise Booking n'a pas pu mettre à jour l'événement dans votre agenda Google. L'invité a le nouvel horaire ; votre agenda affiche toujours l'ancien.
 email-host-sync-failure-action = Ouvrez l'événement dans Google Agenda et déplacez-le à l'horaire ci-dessus. Déplacez l'événement existant plutôt que de le recréer, sinon le lien Google Meet dont dispose déjà l'invité cessera de fonctionner.
 email-writeback-failure-subject = Action requise : { $event } ({ $date }) n'est pas dans votre agenda
 email-writeback-failure-heading = Une réservation manque dans votre agenda
-email-writeback-failure-intro = calrs n'a pas pu ajouter cette réservation à votre agenda, même après plusieurs tentatives. La réservation est confirmée et l'invité a reçu l'invitation.
-email-writeback-failure-action = Ajoutez vous-même l'événement à votre agenda pour ne pas le manquer, et vérifiez la source d'agenda dans calrs. calrs réessaie encore pendant quelques heures ; vous ne recevrez plus cet e-mail pour cette réservation.
+email-writeback-failure-intro = Upraise Booking n'a pas pu ajouter cette réservation à votre agenda, même après plusieurs tentatives. La réservation est confirmée et l'invité a reçu l'invitation.
+email-writeback-failure-action = Ajoutez vous-même l'événement à votre agenda pour ne pas le manquer, et vérifiez la source d'agenda dans Upraise Booking. Upraise Booking réessaie encore pendant quelques heures ; vous ne recevrez plus cet e-mail pour cette réservation.
 email-detail-error = Erreur :
 email-source-failure-subject = Action requise : la source d'agenda « { $source } » ne se synchronise plus
 email-source-failure-heading = Une source d'agenda ne se synchronise plus
-email-source-failure-intro = calrs n'arrive plus à synchroniser cette source d'agenda depuis plus d'une heure. Vos pages de réservation proposent toujours des créneaux, mais ils reposent sur la dernière synchronisation réussie : les événements ajoutés ou déplacés depuis ne sont pas pris en compte.
+email-source-failure-intro = Upraise Booking n'arrive plus à synchroniser cette source d'agenda depuis plus d'une heure. Vos pages de réservation proposent toujours des créneaux, mais ils reposent sur la dernière synchronisation réussie : les événements ajoutés ou déplacés depuis ne sont pas pris en compte.
 email-source-failure-action = Vérifiez la source sur la page Sources d'agenda : un mot de passe expiré ou un accès révoqué en est la cause habituelle. Vous ne recevrez de nouvelles de cette source que si elle se rétablit puis échoue à nouveau.
 email-detail-source = Source d'agenda :
 email-detail-failing-since = En échec depuis :

@@ -171,7 +171,7 @@ action-error-page-title = Fout bij boekingsactie
 
 # Host-initiated reschedule (booking_host_reschedule.html)
 
-host-resched-page-title = Boeking verzetten — calrs
+host-resched-page-title = Boeking verzetten — Upraise Booking
 host-resched-heading = Boeking verzetten
 host-resched-subtitle = { $guest } krijgt dan een e-mail met het verzoek een nieuw tijdstip te kiezen.
 host-resched-currently = Huidig tijdstip:
@@ -235,7 +235,7 @@ common-format-long-date = { $weekday } { $day } { $month } { $year }
 
 # Email signatures and shared bits (src/email.rs)
 
-email-signature = — calrs
+email-signature = — Upraise
 email-action-reschedule = Verzetten
 email-action-cancel-booking = Boeking annuleren
 
@@ -457,7 +457,7 @@ sources-reconnect-title = De Google-toestemmingsprocedure opnieuw doorlopen
 sources-edit = Bewerken
 sources-remove = Verwijderen
 sources-remove-confirm = Bron '{ $name }' verwijderen? Hiermee worden alle gesynchroniseerde afspraken van deze bron verwijderd.
-sources-no-write-calendar = Geen agenda gekozen om naar te schrijven. Bevestigde boekingen blijven in calrs en worden niet naar deze agenda gezet. Kies hieronder een agenda om terugschrijven in te schakelen.
+sources-no-write-calendar = Geen agenda gekozen om naar te schrijven. Bevestigde boekingen blijven in Upraise Booking en worden niet naar deze agenda gezet. Kies hieronder een agenda om terugschrijven in te schakelen.
 sources-write-bookings-to = Boekingen schrijven naar:
 sources-write-none = Geen (niet schrijven)
 sources-empty = Geen agendabronnen gekoppeld. { $link } om beschikbaarheid te controleren.
@@ -539,7 +539,7 @@ settings-error-public-page-language = Kies een geldige taal voor de openbare boe
 settings-dynamic-group = Anderen mogen mij toevoegen aan dynamische groepslinks
 settings-dynamic-group-help = Als dit is ingeschakeld, kunnen andere gebruikers ad-hoc collectieve afspraak-URL's maken waar jij in zit (bijv. { $example }).
 settings-lend-resource = Mijn agendatoegang uitlenen voor het reserveren van faciliteiten
-settings-lend-resource-help = Als een boeking een gedeelde faciliteit moet reserveren (demolab, vergaderruimte) waar jouw agenda-account naar kan schrijven, mag calrs je opgeslagen agendagegevens daarvoor gebruiken.
+settings-lend-resource-help = Als een boeking een gedeelde faciliteit moet reserveren (demolab, vergaderruimte) waar jouw agenda-account naar kan schrijven, mag Upraise Booking je opgeslagen agendagegevens daarvoor gebruiken.
 settings-default-availability = Standaardbeschikbaarheid
 settings-default-availability-help = Je standaardwerktijden. Worden gebruikt voor dynamische groepslinks wanneer anderen je aan een afspraak toevoegen.
 settings-copy-to-all = Naar alle dagen kopiëren
@@ -602,7 +602,7 @@ source-test-heading = Verbindingstest
 source-write-page-title = Terugschrijven naar agenda instellen
 source-write-back = Terug naar dashboard
 source-write-heading = Waar moeten boekingen naartoe?
-source-write-help = Als iemand een afspraak met je boekt, kan calrs die automatisch in je agenda zetten. Kies naar welke agenda boekingen voor { $name } worden geschreven.
+source-write-help = Als iemand een afspraak met je boekt, kan Upraise Booking die automatisch in je agenda zetten. Kies naar welke agenda boekingen voor { $name } worden geschreven.
 source-write-save = Opslaan
 source-write-skip = Nu overslaan
 source-write-sync-results = Synchronisatieresultaten
@@ -742,7 +742,7 @@ source-form-title-add = Agenda toevoegen
 source-form-heading-edit = Agendabron bewerken
 source-form-heading-add = Een agenda koppelen
 source-form-subtitle-edit = Werk de verbinding bij. Laat het wachtwoord leeg om het huidige te behouden. Synchroniseer na het wijzigen van de URL of gebruikersnaam om de lijst met gevonden agenda's te vernieuwen.
-source-form-subtitle-add = Koppel een CalDAV-server of Microsoft Exchange (EWS) zodat calrs je beschikbaarheid kan controleren wanneer gasten een afspraak boeken.
+source-form-subtitle-add = Koppel een CalDAV-server of Microsoft Exchange (EWS) zodat Upraise Booking je beschikbaarheid kan controleren wanneer gasten een afspraak boeken.
 source-form-backend = Backend
 source-form-preset = Voorinstelling
 source-form-connect-google = Koppelen met Google
@@ -759,7 +759,7 @@ source-form-skip-test = Verbindingstest overslaan
 source-form-skip-test-help = Gebruik dit als de test blijft hangen (komt vaak voor bij sommige BlueMind/Zimbra-installaties). Je kunt de verbinding later testen.
 source-form-save = Wijzigingen opslaan
 source-form-add = Agendabron toevoegen
-source-form-help-google-configured = Klik op de knop hieronder om calrs toegang te geven tot je Google Agenda.
+source-form-help-google-configured = Klik op de knop hieronder om Upraise Booking toegang te geven tot je Google Agenda.
 source-form-help-google-unconfigured = De koppeling met Google Agenda is nog niet ingesteld. Vraag je beheerder om Google OAuth2-gegevens in te stellen in het beheerpaneel.
 
 # Calendar source form: provider help (templates/source_form.html)
@@ -773,7 +773,7 @@ source-form-help-sogo = <strong>SOGo</strong> — Gebruik het SOGo-DAV-endpoint.
 source-form-help-radicale = <strong>Radicale</strong> — Gebruik de root-URL van de server.<br> Meestal: <code>https://cal.example.com/</code>
 source-form-help-exchange = <strong>Microsoft Exchange (EWS)</strong>. Gebruik het SOAP-endpoint:<br> <code>https://mail.example.com/EWS/Exchange.asmx</code><br> De gebruikersnaam is het e-mailadres van de mailbox; voor dit account moet inloggen met HTTP Basic-authenticatie via TLS zijn toegestaan (schakel dit in op een servicemailbox als je tenant Basic heeft uitgeschakeld).<br> Kies ook <strong>Microsoft Exchange (EWS)</strong> in het Backend-menu hierboven.
 source-form-help-google = <strong>Google Agenda</strong>: koppelen via OAuth2. Geen wachtwoord nodig.<br>
-source-form-help-other = Voer de <strong>DAV-root-URL</strong> van je CalDAV-server in — niet een specifieke agenda of openbare link.<br> calrs vindt je agenda's automatisch via PROPFIND (RFC 4791).
+source-form-help-other = Voer de <strong>DAV-root-URL</strong> van je CalDAV-server in — niet een specifieke agenda of openbare link.<br> Upraise Booking vindt je agenda's automatisch via PROPFIND (RFC 4791).
 
 # Markdown editor toolbar, short labels (templates/team_form.html, templates/team_settings.html)
 
@@ -1111,7 +1111,7 @@ admin-no-teams = Nog geen teams.
 admin-save-resource = Faciliteit opslaan
 admin-add-resource = Faciliteit toevoegen
 admin-jitsi = Jitsi (automatisch gegenereerde vergaderlinks)
-admin-jitsi-help = Als de locatie van een afspraaktype is ingesteld op "Jitsi (automatisch gegenereerde ruimte)", maakt calrs per boeking een nieuwe ruimte-URL door het onderstaande patroon aan je Jitsi-basis-URL toe te voegen. Er is geen externe API-aanroep nodig.
+admin-jitsi-help = Als de locatie van een afspraaktype is ingesteld op "Jitsi (automatisch gegenereerde ruimte)", maakt Upraise Booking per boeking een nieuwe ruimte-URL door het onderstaande patroon aan je Jitsi-basis-URL toe te voegen. Er is geen externe API-aanroep nodig.
 admin-display-name = Weergavenaam
 admin-jitsi-display-name-placeholder = bijv. Meet DYB
 admin-jitsi-display-name-help = Wordt aan gasten getoond bij de tijdslotkiezer en het boekingsformulier. Standaard "Videogesprek" als dit leeg is.
@@ -1170,7 +1170,7 @@ admin-sms-country = Standaard landcode
 admin-sms-country-hint = (gebruikt als gasten een lokaal telefoonnummer invoeren)
 admin-sms-daily-cap = Daglimiet
 admin-sms-daily-cap-hint = (berichten per dag voor de hele installatie, 0 voor geen limiet)
-admin-sms-daily-cap-help = Boven de limiet stopt calrs met SMS'en en blijft het e-mails versturen, zodat boekingen nooit mislukken omdat het SMS-budget op is.
+admin-sms-daily-cap-help = Boven de limiet stopt Upraise Booking met SMS'en en blijft het e-mails versturen, zodat boekingen nooit mislukken omdat het SMS-budget op is.
 admin-save-sms = SMS-instellingen opslaan
 admin-send-test-sms = Stuur een testbericht naar
 admin-send-test-sms-hint-check = (laat leeg om alleen de inloggegevens te controleren)
@@ -1192,8 +1192,8 @@ admin-set-by-env = — ingesteld via omgevingsvariabele ({ $var }), overschrijft
 admin-google-help = Om de koppeling met Google Agenda in te schakelen, maak je OAuth2-inloggegevens aan in de <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--accent);">Google Cloud Console</a>. Schakel de <strong>CalDAV API</strong> (bezette tijden lezen en boekingen terugschrijven) en de <strong>Google Calendar API</strong> (Google Meet-links) in en voeg daarna { $redirect_uri } toe als geautoriseerde redirect-URI.
 admin-room-pattern-help = Beschikbare tokens: <code>{"{"}username{"}"}</code> (organisator), <code>{"{"}event{"}"}</code> (slug van het afspraaktype), <code>{"{"}date{"}"}</code> (JJJJMMDD), <code>{"{"}random{"}"}</code> (8 tekens). Standaard: { $default }.
 admin-room-pattern-warning = Zonder <code>{"{"}random{"}"}</code> is de ruimtenaam voorspelbaar: twee gasten die op dezelfde dag hetzelfde afspraaktype boeken, delen dan een ruimte en kunnen elkaars vergadering zien. Vaste ruimtes zijn toegestaan (bijv. één persoonlijke ruimte per organisator), maar schakel dit alleen in als je de afweging begrijpt.
-admin-meeting-webhook-help = Als de locatie van een afspraaktype is ingesteld op "Webhook (eigen provider)", stuurt calrs bij bevestiging de boekingsgegevens via een POST naar deze URL en verwacht een JSON-body <code>{"{"}"url": "https://..."{"}"}</code> terug.
-admin-auth-hmac-help = Met HMAC stuurt calrs <code>X-Calrs-Signature: sha256=&lt;hex&gt;</code> mee over de ruwe request-body.
+admin-meeting-webhook-help = Als de locatie van een afspraaktype is ingesteld op "Webhook (eigen provider)", stuurt Upraise Booking bij bevestiging de boekingsgegevens via een POST naar deze URL en verwacht een JSON-body <code>{"{"}"url": "https://..."{"}"}</code> terug.
+admin-auth-hmac-help = Met HMAC stuurt Upraise Booking <code>X-Calrs-Signature: sha256=&lt;hex&gt;</code> mee over de ruwe request-body.
 admin-tls-none-warning = Kies <strong>Geen</strong> alleen voor een relay op deze machine die geen STARTTLS biedt of een zelfondertekend certificaat heeft. E-mail en eventuele inloggegevens gaan dan onversleuteld over het netwerk.
 admin-smtp-env-error-help = Corrigeer de omgevingsvariabelen <code>CALRS_SMTP_*</code>, of verwijder ze om SMTP hier via de database te beheren.
 admin-smtp-env-managed = Beheerd via <strong>omgevingsvariabelen</strong> (overschrijven de database). Pas de variabelen <code>CALRS_SMTP_*</code> aan om dit te wijzigen, of verwijder ze om SMTP hier te beheren.
@@ -1395,16 +1395,16 @@ email-host-confirmed-message = Je hebt de boeking met { $guest } goedgekeurd.
 email-host-confirmed-footer = Het evenement is aan je agenda toegevoegd.
 email-host-sync-failure-subject = Actie nodig: agenda niet bijgewerkt voor { $event } ({ $date })
 email-host-sync-failure-heading = Je agenda is niet bijgewerkt
-email-host-sync-failure-intro = Deze boeking is verzet, maar calrs kon het evenement in je Google Agenda niet bijwerken. De gast heeft de nieuwe tijd; je agenda toont nog de oude.
+email-host-sync-failure-intro = Deze boeking is verzet, maar Upraise Booking kon het evenement in je Google Agenda niet bijwerken. De gast heeft de nieuwe tijd; je agenda toont nog de oude.
 email-host-sync-failure-action = Open het evenement in Google Agenda en verplaats het naar de tijd hierboven. Verplaats het bestaande evenement in plaats van het opnieuw aan te maken, anders werkt de Google Meet-link die de gast al heeft niet meer.
 email-writeback-failure-subject = Actie vereist: { $event } ({ $date }) staat niet in je agenda
 email-writeback-failure-heading = Er ontbreekt een boeking in je agenda
-email-writeback-failure-intro = calrs kon deze boeking ook na meerdere pogingen niet aan je agenda toevoegen. De boeking is bevestigd en de gast heeft de uitnodiging.
-email-writeback-failure-action = Zet het evenement zelf in je agenda zodat je het niet mist, en controleer de agendabron in calrs. calrs blijft het nog een paar uur proberen; je krijgt deze e-mail voor deze boeking niet nog een keer.
+email-writeback-failure-intro = Upraise Booking kon deze boeking ook na meerdere pogingen niet aan je agenda toevoegen. De boeking is bevestigd en de gast heeft de uitnodiging.
+email-writeback-failure-action = Zet het evenement zelf in je agenda zodat je het niet mist, en controleer de agendabron in Upraise Booking. Upraise Booking blijft het nog een paar uur proberen; je krijgt deze e-mail voor deze boeking niet nog een keer.
 email-detail-error = Fout:
 email-source-failure-subject = Actie vereist: agendabron "{ $source }" synchroniseert niet
 email-source-failure-heading = Een agendabron synchroniseert niet meer
-email-source-failure-intro = calrs kan deze agendabron al meer dan een uur niet synchroniseren. Je boekingspagina's bieden nog steeds tijden aan, maar die zijn gebaseerd op de laatste geslaagde synchronisatie, dus evenementen die sindsdien zijn toegevoegd of verplaatst worden niet meegenomen.
+email-source-failure-intro = Upraise Booking kan deze agendabron al meer dan een uur niet synchroniseren. Je boekingspagina's bieden nog steeds tijden aan, maar die zijn gebaseerd op de laatste geslaagde synchronisatie, dus evenementen die sindsdien zijn toegevoegd of verplaatst worden niet meegenomen.
 email-source-failure-action = Controleer de bron op de pagina Agendabronnen: meestal is een verlopen wachtwoord of ingetrokken toegang de oorzaak. Je hoort pas weer over deze bron als die herstelt en daarna opnieuw faalt.
 email-detail-source = Agendabron:
 email-detail-failing-since = Faalt sinds:

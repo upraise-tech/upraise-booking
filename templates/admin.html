@@ -1,5 +1,5 @@
 {% extends "dashboard_base.html" %}
-{% block title %}{{ t("admin-page-title") }} — calrs{% endblock %}
+{% block title %}{{ t("admin-page-title") }} — Upraise Booking{% endblock %}
 {% block dashboard_content %}
 <div class="card">
   <h1>{{ t("admin-heading") }}</h1>
@@ -586,7 +586,7 @@ document.querySelectorAll('input[type="color"]').forEach(function(picker) {
         {{ t("admin-room-pattern-help", default='<code>' ~ (jitsi_default_pattern | escape) ~ '</code>') | safe }}
       </span>
       <span id="jitsi_pattern_random_warning" style="display: none; font-size: 0.8rem; color: var(--warning-text, #b45309); margin-top: 0.25rem;">
-        ⚠ {{ t("admin-room-pattern-warning") | safe }}
+        <svg class="up-i up-i-alert" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> {{ t("admin-room-pattern-warning") | safe }}
       </span>
     </div>
     <script>
@@ -646,9 +646,9 @@ document.querySelectorAll('input[type="color"]').forEach(function(picker) {
   <h2>{{ t("admin-smtp") }}</h2>
 
   {% if smtp_test_result == "sent" %}
-  <p style="color: var(--success); font-size: 0.875rem;">✓ {{ t("admin-smtp-test-sent") }}</p>
+  <p style="color: var(--success); font-size: 0.875rem;"><svg class="up-i up-i-check" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> {{ t("admin-smtp-test-sent") }}</p>
   {% elif smtp_test_result == "error" %}
-  <p style="color: var(--error-text); font-size: 0.875rem;">✗ {{ t("admin-smtp-test-failed") }}</p>
+  <p style="color: var(--error-text); font-size: 0.875rem;"><svg class="up-i up-i-x" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> {{ t("admin-smtp-test-failed") }}</p>
   {% endif %}
 
   {% if smtp_error %}
@@ -744,11 +744,11 @@ document.querySelectorAll('input[type="color"]').forEach(function(picker) {
   </p>
 
   {% if sms_test_result == "sent" %}
-  <p style="color: var(--success); font-size: 0.875rem;">✓ {{ sms_test_detail or t("admin-sms-test-sent") }}</p>
+  <p style="color: var(--success); font-size: 0.875rem;"><svg class="up-i up-i-check" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> {{ sms_test_detail or t("admin-sms-test-sent") }}</p>
   {% elif sms_test_result == "checked" %}
-  <p style="color: var(--success); font-size: 0.875rem;">✓ {{ sms_test_detail or t("admin-sms-test-checked") }}</p>
+  <p style="color: var(--success); font-size: 0.875rem;"><svg class="up-i up-i-check" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> {{ sms_test_detail or t("admin-sms-test-checked") }}</p>
   {% elif sms_test_result == "error" %}
-  <p style="color: var(--error-text); font-size: 0.875rem;">✗ {{ sms_test_detail or t("admin-sms-test-error") }}</p>
+  <p style="color: var(--error-text); font-size: 0.875rem;"><svg class="up-i up-i-x" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg> {{ sms_test_detail or t("admin-sms-test-error") }}</p>
   {% endif %}
 
   {% if sms_trial_mode %}

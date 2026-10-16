@@ -310,53 +310,58 @@
 </style>
 
 <div class="dashboard-layout">
-  <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('open');">&#9776;</button>
+  <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.sidebar-overlay').classList.toggle('open');"><svg class="up-i up-i-menu" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16"/><path d="M4 6h16"/><path d="M4 18h16"/></svg></button>
   <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('open');"></div>
 
   <nav class="sidebar">
     <a href="/dashboard" class="sidebar-brand" style="text-decoration: none; color: inherit;">
-      <img src="/brand-logo" alt="calrs">
-      <span class="sidebar-brand-name"><span style="color: var(--accent);">cal</span><span style="color: #e45724;">rs</span></span>
+      <img src="/upraise-brand/mark.svg" alt="">
+      <span class="sidebar-brand-name">Upraise <span class="up-sub">Booking</span></span>
     </a>
 
     <div class="sidebar-nav">
+      <div class="sidebar-section up-outreach">
+        <a href="https://outreach.upraise.uk/app/home" class="sidebar-link">
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg></span> Upraise Outreach
+        </a>
+      </div>
       <div class="sidebar-section">
         <div class="sidebar-section-label">{{ t("nav-section-scheduling") }}</div>
         <a href="/dashboard" class="sidebar-link {% if sidebar.active == 'overview' %}active{% endif %}">
-          <span class="icon">&#9632;</span> {{ t("nav-overview") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> {{ t("nav-overview") }}
         </a>
         <a href="/dashboard/event-types" class="sidebar-link {% if sidebar.active == 'event-types' %}active{% endif %}">
-          <span class="icon">&#128197;</span> {{ t("nav-event-types") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/></svg></span> {{ t("nav-event-types") }}
         </a>
         <a href="/dashboard/bookings" class="sidebar-link {% if sidebar.active == 'bookings' %}active{% endif %}">
-          <span class="icon">&#128203;</span> {{ t("nav-bookings") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span> {{ t("nav-bookings") }}
         </a>
         <a href="/dashboard/teams" class="sidebar-link {% if sidebar.active == 'teams' %}active{% endif %}">
-          <span class="icon">&#128101;</span> {{ t("nav-teams") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> {{ t("nav-teams") }}
         </a>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">{{ t("nav-section-shared-links") }}</div>
         <a href="/dashboard/invite-links" class="sidebar-link {% if sidebar.active == 'organization' %}active{% endif %}">
-          <span class="icon">&#127970;</span> {{ t("nav-invite-links") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span> {{ t("nav-invite-links") }}
         </a>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">{{ t("nav-section-calendars") }}</div>
         <a href="/dashboard/sources" class="sidebar-link {% if sidebar.active == 'sources' %}active{% endif %}">
-          <span class="icon">&#128197;</span> {{ t("nav-sources") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></svg></span> {{ t("nav-sources") }}
         </a>
       </div>
 
       <div class="sidebar-section">
         <div class="sidebar-section-label">{{ t("nav-section-personal") }}</div>
         <a href="/dashboard/settings" class="sidebar-link {% if sidebar.active == 'settings' %}active{% endif %}">
-          <span class="icon">&#9881;</span> {{ t("nav-settings") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span> {{ t("nav-settings") }}
         </a>
         <a href="/dashboard/troubleshoot" data-calrs-sync class="sidebar-link {% if sidebar.active == 'troubleshoot' %}active{% endif %}">
-          <span class="icon">&#128269;</span> {{ t("nav-troubleshoot") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span> {{ t("nav-troubleshoot") }}
         </a>
       </div>
 
@@ -364,7 +369,7 @@
       <div class="sidebar-section">
         <div class="sidebar-section-label">{{ t("nav-section-admin") }}</div>
         <a href="/dashboard/admin" class="sidebar-link {% if sidebar.active == 'admin' %}active{% endif %}">
-          <span class="icon">&#128272;</span> {{ t("nav-admin-panel") }}
+          <span class="icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span> {{ t("nav-admin-panel") }}
         </a>
       </div>
       {% endif %}
@@ -386,7 +391,7 @@
           </div>
         </a>
         <form method="post" action="/auth/logout" style="flex-shrink: 0;">
-          <button type="submit" class="sidebar-signout" title="{{ t('nav-sign-out') }}" aria-label="{{ t('nav-sign-out') }}">&#8592;</button>
+          <button type="submit" class="sidebar-signout" title="{{ t('nav-sign-out') }}" aria-label="{{ t('nav-sign-out') }}"><svg class="up-i up-i-log-out" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button>
         </form>
       </div>
       {% if sidebar.version %}<div style="font-size: 0.7rem; color: var(--text-muted); padding: 0.25rem 0.75rem 0; opacity: 0.6;"><a href="https://github.com/olivierlambert/calrs/releases/tag/v{{ sidebar.version }}" target="_blank" rel="noopener" style="color: inherit; text-decoration: none;" title="{{ t('nav-release-notes') }}">v{{ sidebar.version }}</a></div>{% endif %}

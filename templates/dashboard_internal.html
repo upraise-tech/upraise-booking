@@ -1,5 +1,5 @@
 {% extends "dashboard_base.html" %}
-{% block title %}{{ t("invite-links-page-title") }} — calrs{% endblock %}
+{% block title %}{{ t("invite-links-page-title") }} — Upraise Booking{% endblock %}
 {% block dashboard_content %}
 <div class="card">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -29,7 +29,7 @@
     {% endfor %}
   {% else %}
     <div class="empty" style="padding: 2rem 1rem;">
-      <div class="empty-icon">&#127970;</div>
+      <div class="empty-icon"><svg class="up-i up-i-share" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98"/><path d="m15.41 6.51-6.82 3.98"/></svg></div>
       <div class="empty-text">{{ t("invite-links-empty", link='<a href="/dashboard/event-types/new?preset=internal" style="color: var(--accent); text-decoration: none;">' ~ (t("invite-links-empty-link-label") | escape) ~ '</a>') | safe }}</div>
     </div>
   {% endif %}

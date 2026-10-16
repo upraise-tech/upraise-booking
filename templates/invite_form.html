@@ -1,6 +1,6 @@
 {% extends "dashboard_base.html" %}
 
-{% block title %}Invites — {{ event_type_title }} — calrs{% endblock %}
+{% block title %}Invites — {{ event_type_title }} — Upraise Booking{% endblock %}
 
 {% block dashboard_content %}
 
@@ -127,7 +127,7 @@
   </div>
   {% else %}
   <div class="empty" style="padding: 1.5rem 1rem;">
-    <div class="empty-icon">&#9993;</div>
+    <div class="empty-icon"><svg class="up-i up-i-mail" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
     <div class="empty-text">{{ t("invites-empty") }}</div>
   </div>
   {% endif %}

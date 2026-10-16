@@ -9,8 +9,10 @@
   {% else %}
   <meta name="color-scheme" content="light dark">
   {% endif %}
-  <title>{% block title %}calrs{% endblock %}</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦀</text></svg>">
+  <title>{% block title %}Upraise Booking{% endblock %}</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/upraise-brand/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/upraise-brand/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/upraise-brand/apple-touch-icon.png">
   <script>
   // Apply theme ASAP to avoid flash. In embed mode the parent controls theme
   // via ?theme= so we skip localStorage and respect the URL param only.
@@ -481,6 +483,7 @@
     }
   </style>
   <link rel="stylesheet" href="/accent.css">
+  <link rel="stylesheet" href="/upraise-brand/booking.css?v=__V__">
   {% if embed %}
   <style>
     /* Embed mode: drop the centered card frame so the host page controls the
@@ -533,7 +536,7 @@
   {% endif %}
   <div class="container">
     {% block content %}{% endblock %}
-    {% block footer %}<div class="powered"><span>{{ t('base-powered-by') }} <a href="https://cal.rs">calrs</a> 🦀</span></div>{% endblock %}
+    {% block footer %}{% endblock %}
     {% block theme_toggle %}
     <button id="theme-toggle" type="button" title="{{ t('base-theme-toggle') }}" aria-label="{{ t('base-theme-toggle') }}" class="theme-pill">
       <span class="theme-pill-track">

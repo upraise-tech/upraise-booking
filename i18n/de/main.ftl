@@ -171,7 +171,7 @@ action-error-page-title = Fehler bei der Buchungsaktion
 
 # Host-initiated reschedule (booking_host_reschedule.html)
 
-host-resched-page-title = Buchung verschieben — calrs
+host-resched-page-title = Buchung verschieben — Upraise Booking
 host-resched-heading = Buchung verschieben
 host-resched-subtitle = { $guest } erhält eine E-Mail mit der Bitte, einen neuen Termin auszuwählen.
 host-resched-currently = Aktuell:
@@ -235,7 +235,7 @@ common-format-long-date = { $weekday }, { $day }. { $month } { $year }
 
 # Email signatures and shared bits (src/email.rs)
 
-email-signature = — calrs
+email-signature = — Upraise
 email-action-reschedule = Verschieben
 email-action-cancel-booking = Buchung stornieren
 
@@ -456,7 +456,7 @@ sources-reconnect-title = Die Google-Zustimmung erneut durchlaufen
 sources-edit = Bearbeiten
 sources-remove = Entfernen
 sources-remove-confirm = Quelle „{ $name }“ entfernen? Dabei werden alle von dieser Quelle synchronisierten Termine gelöscht.
-sources-no-write-calendar = Kein Schreibkalender ausgewählt. Bestätigte Buchungen bleiben in calrs und werden nicht in diesen Kalender übertragen. Wähle unten einen aus, um das Rückschreiben zu aktivieren.
+sources-no-write-calendar = Kein Schreibkalender ausgewählt. Bestätigte Buchungen bleiben in Upraise Booking und werden nicht in diesen Kalender übertragen. Wähle unten einen aus, um das Rückschreiben zu aktivieren.
 sources-write-bookings-to = Buchungen schreiben nach:
 sources-write-none = Keiner (nicht schreiben)
 sources-empty = Keine Kalenderquellen verbunden. { $link }, um die Verfügbarkeit zu prüfen.
@@ -538,7 +538,7 @@ settings-error-public-page-language = Wähle eine gültige Sprache für die öff
 settings-dynamic-group = Anderen erlauben, mich in dynamische Gruppenlinks einzubeziehen
 settings-dynamic-group-help = Wenn aktiviert, können andere Benutzer spontane Gruppentermin-URLs erstellen, die dich einschließen (z. B. { $example }).
 settings-lend-resource = Meinen Kalenderzugang für Ressourcenreservierungen bereitstellen
-settings-lend-resource-help = Wenn eine Buchung eine geteilte Ressource (Demolabor, Besprechungsraum) reservieren muss, in die dein Kalenderkonto schreiben darf, erlaube calrs, deine gespeicherten Kalenderzugangsdaten dafür zu verwenden.
+settings-lend-resource-help = Wenn eine Buchung eine geteilte Ressource (Demolabor, Besprechungsraum) reservieren muss, in die dein Kalenderkonto schreiben darf, erlaube Upraise Booking, deine gespeicherten Kalenderzugangsdaten dafür zu verwenden.
 settings-default-availability = Standardverfügbarkeit
 settings-default-availability-help = Deine Standardarbeitszeiten. Werden für dynamische Gruppenlinks verwendet, wenn andere dich zu einem Termin hinzufügen.
 settings-copy-to-all = Auf alle Tage übertragen
@@ -601,7 +601,7 @@ source-test-heading = Verbindungstest
 source-write-page-title = Kalender-Rückschreiben einrichten
 source-write-back = Zurück zum Dashboard
 source-write-heading = Wohin sollen Buchungen geschrieben werden?
-source-write-help = Wenn jemand einen Termin mit dir bucht, kann calrs den Eintrag automatisch in deinem Kalender anlegen. Wähle, in welchen Kalender Buchungen für { $name } geschrieben werden.
+source-write-help = Wenn jemand einen Termin mit dir bucht, kann Upraise Booking den Eintrag automatisch in deinem Kalender anlegen. Wähle, in welchen Kalender Buchungen für { $name } geschrieben werden.
 source-write-save = Speichern
 source-write-skip = Vorerst überspringen
 source-write-sync-results = Ergebnisse der Synchronisierung
@@ -741,7 +741,7 @@ source-form-title-add = Kalender hinzufügen
 source-form-heading-edit = Kalenderquelle bearbeiten
 source-form-heading-add = Kalender verbinden
 source-form-subtitle-edit = Aktualisiere die Verbindung. Lass das Passwort leer, um das bestehende beizubehalten. Führe nach einer Änderung von URL oder Benutzername eine Synchronisierung durch, um die Kalenderliste zu aktualisieren.
-source-form-subtitle-add = Verbinde einen CalDAV-Server oder Microsoft Exchange (EWS), damit calrs bei Buchungen die Verfügbarkeit prüfen kann.
+source-form-subtitle-add = Verbinde einen CalDAV-Server oder Microsoft Exchange (EWS), damit Upraise Booking bei Buchungen die Verfügbarkeit prüfen kann.
 source-form-backend = Backend
 source-form-preset = Voreinstellung
 source-form-connect-google = Mit Google verbinden
@@ -758,7 +758,7 @@ source-form-skip-test = Verbindungstest überspringen
 source-form-skip-test-help = Nutze dies, wenn der Test hängt (kommt bei manchen BlueMind-/Zimbra-Installationen vor). Du kannst die Verbindung später testen.
 source-form-save = Änderungen speichern
 source-form-add = Kalenderquelle hinzufügen
-source-form-help-google-configured = Klicke auf die Schaltfläche unten, um calrs den Zugriff auf deinen Google Kalender zu erlauben.
+source-form-help-google-configured = Klicke auf die Schaltfläche unten, um Upraise Booking den Zugriff auf deinen Google Kalender zu erlauben.
 source-form-help-google-unconfigured = Die Google-Kalender-Integration ist noch nicht eingerichtet. Bitte deine Administration, im Administrationsbereich OAuth2-Zugangsdaten für Google zu hinterlegen.
 
 # Calendar source form: provider help (templates/source_form.html)
@@ -772,7 +772,7 @@ source-form-help-sogo = <strong>SOGo</strong> — Verwende den DAV-Endpunkt von 
 source-form-help-radicale = <strong>Radicale</strong> — Verwende die Wurzel-URL des Servers.<br> Üblicherweise: <code>https://cal.example.com/</code>
 source-form-help-exchange = <strong>Microsoft Exchange (EWS)</strong>. Verwende den SOAP-Endpunkt:<br> <code>https://mail.example.com/EWS/Exchange.asmx</code><br> Der Benutzername ist die Postfachadresse; das Passwort muss HTTP Basic über TLS zulassen (bei deaktiviertem Basic im Tenant an einem Dienstpostfach aktivieren).<br> Wähle außerdem oben im Backend-Menü <strong>Microsoft Exchange (EWS)</strong>.
 source-form-help-google = <strong>Google Kalender</strong>: Verbindung über OAuth2. Kein Passwort nötig.<br>
-source-form-help-other = Gib die <strong>DAV-Wurzel-URL</strong> deines CalDAV-Servers an — nicht die eines einzelnen Kalenders oder einen öffentlichen Link.<br> calrs findet deine Kalender automatisch per PROPFIND (RFC 4791).
+source-form-help-other = Gib die <strong>DAV-Wurzel-URL</strong> deines CalDAV-Servers an — nicht die eines einzelnen Kalenders oder einen öffentlichen Link.<br> Upraise Booking findet deine Kalender automatisch per PROPFIND (RFC 4791).
 
 # Markdown editor toolbar, short labels (templates/team_form.html, templates/team_settings.html)
 
@@ -1110,7 +1110,7 @@ admin-no-teams = Noch keine Teams.
 admin-save-resource = Ressource speichern
 admin-add-resource = Ressource hinzufügen
 admin-jitsi = Jitsi (automatisch erzeugte Terminlinks)
-admin-jitsi-help = Wenn der Ort einer Terminart auf „Jitsi (automatisch erzeugter Raum)“ gesetzt ist, baut calrs für jede Buchung eine frische Raum-URL, indem es das Muster unten an deine Jitsi-Basis-URL anhängt. Ein externer API-Aufruf ist nicht nötig.
+admin-jitsi-help = Wenn der Ort einer Terminart auf „Jitsi (automatisch erzeugter Raum)“ gesetzt ist, baut Upraise Booking für jede Buchung eine frische Raum-URL, indem es das Muster unten an deine Jitsi-Basis-URL anhängt. Ein externer API-Aufruf ist nicht nötig.
 admin-display-name = Anzeigename
 admin-jitsi-display-name-placeholder = z. B. Meet DYB
 admin-jitsi-display-name-help = Wird Gästen in der Zeitfensterauswahl und im Buchungsformular angezeigt. Standard ist „Videoanruf“, wenn leer.
@@ -1169,7 +1169,7 @@ admin-sms-country = Standard-Ländervorwahl
 admin-sms-country-hint = (wird verwendet, wenn Gäste eine lokale Telefonnummer eingeben)
 admin-sms-daily-cap = Tageslimit
 admin-sms-daily-cap-hint = (Nachrichten pro Tag für die gesamte Instanz, 0 für kein Limit)
-admin-sms-daily-cap-help = Jenseits des Limits verschickt calrs keine SMS mehr und sendet weiter E-Mails, damit Buchungen nie am erschöpften SMS-Budget scheitern.
+admin-sms-daily-cap-help = Jenseits des Limits verschickt Upraise Booking keine SMS mehr und sendet weiter E-Mails, damit Buchungen nie am erschöpften SMS-Budget scheitern.
 admin-save-sms = SMS-Einstellungen speichern
 admin-send-test-sms = Testnachricht senden an
 admin-send-test-sms-hint-check = (leer lassen, um nur die Zugangsdaten zu prüfen)
@@ -1191,8 +1191,8 @@ admin-set-by-env = — durch die Umgebung gesetzt ({ $var }), überschreibt den 
 admin-google-help = Um die Google-Kalender-Integration zu aktivieren, erstelle OAuth2-Zugangsdaten in der <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color: var(--accent);">Google Cloud Console</a>. Aktiviere die <strong>CalDAV API</strong> (Lesen belegter Zeiten und Zurückschreiben von Buchungen) und die <strong>Google Calendar API</strong> (Google-Meet-Links) und trage dann { $redirect_uri } als zugelassene Weiterleitungs-URI ein.
 admin-room-pattern-help = Verfügbare Platzhalter: <code>{"{"}username{"}"}</code> (Gastgeber), <code>{"{"}event{"}"}</code> (Kürzel der Terminart), <code>{"{"}date{"}"}</code> (JJJJMMTT), <code>{"{"}random{"}"}</code> (8 Zeichen). Standard: { $default }.
 admin-room-pattern-warning = Ohne <code>{"{"}random{"}"}</code> ist der Raumname vorhersehbar: Zwei Gäste, die dieselbe Terminart am selben Tag buchen, landen im selben Raum und sehen das Gespräch des jeweils anderen. Feste Räume sind zulässig (etwa ein persönlicher Raum je Gastgeber), aktiviere das aber nur, wenn du den Kompromiss verstehst.
-admin-meeting-webhook-help = Wenn der Ort einer Terminart auf „Webhook (eigener Anbieter)“ gesetzt ist, sendet calrs die Buchungsdaten bei der Bestätigung per POST an diese URL und erwartet als Antwort einen JSON-Body <code>{"{"}"url": "https://..."{"}"}</code>.
-admin-auth-hmac-help = Mit HMAC sendet calrs <code>X-Calrs-Signature: sha256=&lt;hex&gt;</code> über den unveränderten Anfragetext.
+admin-meeting-webhook-help = Wenn der Ort einer Terminart auf „Webhook (eigener Anbieter)“ gesetzt ist, sendet Upraise Booking die Buchungsdaten bei der Bestätigung per POST an diese URL und erwartet als Antwort einen JSON-Body <code>{"{"}"url": "https://..."{"}"}</code>.
+admin-auth-hmac-help = Mit HMAC sendet Upraise Booking <code>X-Calrs-Signature: sha256=&lt;hex&gt;</code> über den unveränderten Anfragetext.
 admin-tls-none-warning = Wähle <strong>Keines</strong> nur für ein Relay auf diesem Rechner, das kein STARTTLS anbietet oder dessen Zertifikat selbstsigniert ist. E-Mails und etwaige Zugangsdaten gehen dann unverschlüsselt über die Leitung.
 admin-smtp-env-error-help = Korrigiere die Umgebungsvariablen <code>CALRS_SMTP_*</code> oder entferne sie, um SMTP hier über die Datenbank zu verwalten.
 admin-smtp-env-managed = Verwaltet über <strong>Umgebungsvariablen</strong> (haben Vorrang vor der Datenbank). Ändere die Variablen <code>CALRS_SMTP_*</code> oder entferne sie, um SMTP hier zu verwalten.
@@ -1394,16 +1394,16 @@ email-host-confirmed-message = Du hast die Buchung mit { $guest } genehmigt.
 email-host-confirmed-footer = Der Termin wurde deinem Kalender hinzugefügt.
 email-host-sync-failure-subject = Aktion nötig: Kalender für { $event } nicht aktualisiert ({ $date })
 email-host-sync-failure-heading = Dein Kalender wurde nicht aktualisiert
-email-host-sync-failure-intro = Diese Buchung wurde verschoben, aber calrs konnte den Termin in deinem Google Kalender nicht aktualisieren. Der Gast hat die neue Uhrzeit, dein Kalender zeigt noch die alte.
+email-host-sync-failure-intro = Diese Buchung wurde verschoben, aber Upraise Booking konnte den Termin in deinem Google Kalender nicht aktualisieren. Der Gast hat die neue Uhrzeit, dein Kalender zeigt noch die alte.
 email-host-sync-failure-action = Öffne den Termin in Google Kalender und verschiebe ihn auf die oben genannte Uhrzeit. Verschiebe den vorhandenen Termin, statt ihn neu anzulegen, sonst funktioniert der Google-Meet-Link nicht mehr, den der Gast bereits hat.
 email-writeback-failure-subject = Handlungsbedarf: { $event } ({ $date }) fehlt in deinem Kalender
 email-writeback-failure-heading = Eine Buchung fehlt in deinem Kalender
-email-writeback-failure-intro = calrs konnte diese Buchung auch nach mehreren Versuchen nicht in deinen Kalender eintragen. Die Buchung ist bestätigt und der Gast hat die Einladung.
-email-writeback-failure-action = Trage den Termin selbst in deinen Kalender ein, damit du ihn nicht verpasst, und prüfe die Kalenderquelle in calrs. calrs versucht es noch einige Stunden weiter; du bekommst diese E-Mail für diese Buchung nicht noch einmal.
+email-writeback-failure-intro = Upraise Booking konnte diese Buchung auch nach mehreren Versuchen nicht in deinen Kalender eintragen. Die Buchung ist bestätigt und der Gast hat die Einladung.
+email-writeback-failure-action = Trage den Termin selbst in deinen Kalender ein, damit du ihn nicht verpasst, und prüfe die Kalenderquelle in Upraise Booking. Upraise Booking versucht es noch einige Stunden weiter; du bekommst diese E-Mail für diese Buchung nicht noch einmal.
 email-detail-error = Fehler:
 email-source-failure-subject = Handlungsbedarf: Kalenderquelle „{ $source }“ synchronisiert nicht
 email-source-failure-heading = Eine Kalenderquelle synchronisiert nicht mehr
-email-source-failure-intro = calrs kann diese Kalenderquelle seit über einer Stunde nicht synchronisieren. Deine Buchungsseiten bieten weiter Termine an, die aber auf der letzten erfolgreichen Synchronisierung beruhen: Seitdem hinzugefügte oder verschobene Termine werden nicht berücksichtigt.
+email-source-failure-intro = Upraise Booking kann diese Kalenderquelle seit über einer Stunde nicht synchronisieren. Deine Buchungsseiten bieten weiter Termine an, die aber auf der letzten erfolgreichen Synchronisierung beruhen: Seitdem hinzugefügte oder verschobene Termine werden nicht berücksichtigt.
 email-source-failure-action = Prüfe die Quelle auf der Seite Kalenderquellen: Meist ist ein abgelaufenes Passwort oder ein entzogener Zugriff die Ursache. Von dieser Quelle hörst du erst wieder, wenn sie sich erholt und danach erneut ausfällt.
 email-detail-source = Kalenderquelle:
 email-detail-failing-since = Fehlerhaft seit:

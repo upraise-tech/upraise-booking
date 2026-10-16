@@ -1,5 +1,5 @@
 {% extends "dashboard_base.html" %}
-{% block title %}{{ t("sources-page-title") }} — calrs{% endblock %}
+{% block title %}{{ t("sources-page-title") }} — Upraise Booking{% endblock %}
 {% block dashboard_content %}
 <div class="card">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -42,7 +42,7 @@
       <div style="margin-top: 0.5rem;">
         {% if not s.write_calendar_href %}
         <div style="margin-bottom: 0.4rem; padding: 0.4rem 0.6rem; background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.4); border-radius: var(--radius); color: var(--text); font-size: 0.78rem;">
-          ⚠ {{ t("sources-no-write-calendar") }}
+          <svg class="up-i up-i-alert" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> {{ t("sources-no-write-calendar") }}
         </div>
         {% endif %}
         <form method="post" action="/dashboard/sources/{{ s.id }}/write-calendar" style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">

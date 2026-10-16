@@ -1,5 +1,5 @@
 {% extends "dashboard_base.html" %}
-{% block title %}{{ t("settings-page-title") }} — calrs{% endblock %}
+{% block title %}{{ t("settings-page-title") }} — Upraise Booking{% endblock %}
 {% block dashboard_content %}
 <div class="card">
   <h1>{{ t("settings-heading") }}</h1>
@@ -18,7 +18,7 @@
     <div style="display: flex; gap: 0.5rem; align-items: center;">
       <input type="text" id="public-url" readonly value="" style="flex: 1; font-size: 0.85rem; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font-family: monospace;">
       <button type="button" id="copy-url-btn" class="slot-btn" style="cursor: pointer; font-weight: 600; color: var(--accent); border-color: var(--accent); white-space: nowrap;">{{ t("settings-copy") }}</button>
-      <a id="open-url-link" href="" target="_blank" rel="noopener noreferrer" class="slot-btn" style="text-decoration: none; font-size: 0.85rem; white-space: nowrap;">{{ t("settings-open") }} &#8599;</a>
+      <a id="open-url-link" href="" target="_blank" rel="noopener noreferrer" class="slot-btn" style="text-decoration: none; font-size: 0.85rem; white-space: nowrap;">{{ t("settings-open") }} <svg class="up-i up-i-arrow-up-right" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></a>
     </div>
   </div>
   <script>
@@ -91,7 +91,7 @@
           <button type="button" data-action="strikethrough" title="{{ t('editor-strikethrough') }}" style="padding: 0.25rem 0.5rem; background: none; border: 1px solid transparent; border-radius: 3px; cursor: pointer; text-decoration: line-through; font-size: 0.85rem; color: var(--text); font-family: inherit; line-height: 1;">S</button>
           <button type="button" data-action="code" title="{{ t('editor-code') }}" style="padding: 0.25rem 0.5rem; background: none; border: 1px solid transparent; border-radius: 3px; cursor: pointer; font-family: monospace; font-size: 0.85rem; color: var(--text); line-height: 1;">&lt;/&gt;</button>
           <div style="width: 1px; background: var(--border); margin: 0.125rem 0.25rem;"></div>
-          <button type="button" data-action="link" title="{{ t('editor-link') }}" style="padding: 0.25rem 0.5rem; background: none; border: 1px solid transparent; border-radius: 3px; cursor: pointer; font-size: 0.85rem; color: var(--text); font-family: inherit; line-height: 1;">&#128279;</button>
+          <button type="button" data-action="link" title="{{ t('editor-link') }}" style="padding: 0.25rem 0.5rem; background: none; border: 1px solid transparent; border-radius: 3px; cursor: pointer; font-size: 0.85rem; color: var(--text); font-family: inherit; line-height: 1;"><svg class="up-i up-i-link" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
           <div style="flex: 1;"></div>
           <button type="button" class="md-preview-toggle" title="{{ t('editor-toggle-preview') }}" style="padding: 0.25rem 0.5rem; background: none; border: 1px solid transparent; border-radius: 3px; cursor: pointer; font-size: 0.75rem; color: var(--text-muted); font-family: inherit; line-height: 1;">{{ t("editor-preview") }}</button>
         </div>
@@ -172,13 +172,13 @@
   <h2 style="font-size: 1rem; margin-bottom: 0.75rem;">{{ t("settings-appearance") }}</h2>
   <div id="theme-picker" style="display: flex; gap: 0.5rem;">
     <button type="button" data-theme="system" class="slot-btn" style="cursor: pointer; font-size: 0.85rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.375rem;">
-      <span style="font-size: 0.9rem;">&#128187;</span> {{ t("settings-theme-system") }}
+      <span style="font-size: 0.9rem;"><svg class="up-i up-i-monitor" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></span> {{ t("settings-theme-system") }}
     </button>
     <button type="button" data-theme="light" class="slot-btn" style="cursor: pointer; font-size: 0.85rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.375rem;">
-      <span style="font-size: 0.9rem;">&#9728;&#65039;</span> {{ t("settings-theme-light") }}
+      <span style="font-size: 0.9rem;"><svg class="up-i up-i-sun" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span> {{ t("settings-theme-light") }}
     </button>
     <button type="button" data-theme="dark" class="slot-btn" style="cursor: pointer; font-size: 0.85rem; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.375rem;">
-      <span style="font-size: 0.9rem;">&#127769;</span> {{ t("settings-theme-dark") }}
+      <span style="font-size: 0.9rem;"><svg class="up-i up-i-moon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span> {{ t("settings-theme-dark") }}
     </button>
   </div>
   <script>
