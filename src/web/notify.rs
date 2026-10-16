@@ -260,6 +260,9 @@ pub async fn run_reminder_loop(pool: SqlitePool, secret_key: [u8; 32]) {
         // (#162).
         writeback::retry_failed_writebacks(&pool, &secret_key, Utc::now()).await;
 
+        // Booked, rescheduled and cancelled bookings for the CRM (Upraise Outreach), when configured.
+        super::booking_events::deliver_due(&pool, &secret_key).await;
+
         // Background sync: pick the stalest enabled source and sync it.
         // With ctag + sync-token this is very cheap for unchanged calendars.
         let stalest: Option<(String,)> = sqlx::query_as(

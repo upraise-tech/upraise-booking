@@ -2,6 +2,7 @@ mod admin;
 mod availability;
 mod booking;
 mod booking_actions;
+pub(crate) mod booking_events;
 mod branding;
 mod calendar_push;
 pub mod captcha;
@@ -744,6 +745,10 @@ pub async fn create_router(pool: SqlitePool, data_dir: PathBuf, secret_key: [u8;
         .route(
             "/dashboard/admin/meeting-webhook",
             post(admin_update_meeting_webhook),
+        )
+        .route(
+            "/dashboard/admin/booking-events",
+            post(admin_update_booking_events),
         )
         .route("/dashboard/admin/logo", post(admin_upload_logo))
         .route("/dashboard/admin/logo/delete", post(admin_delete_logo))

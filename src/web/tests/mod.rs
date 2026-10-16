@@ -9,6 +9,7 @@ mod auth_pages;
 mod availability;
 mod booking;
 mod booking_actions;
+mod booking_events;
 mod booking_time;
 mod branding;
 mod dashboard;
