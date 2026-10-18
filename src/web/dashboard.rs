@@ -671,7 +671,8 @@ fn settings_render(
         Ok(t) => t,
         Err(e) => return internal_error_html("internal", &e),
     };
-    let tz_options: Vec<minijinja::Value> = common_timezones_with("")
+    // The saved zone is always offered, so saving the form never changes it silently.
+    let tz_options: Vec<minijinja::Value> = common_timezones_with(values.timezone)
         .iter()
         .map(|(iana, label)| {
             context! { value => iana, label => label }
