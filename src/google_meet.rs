@@ -263,6 +263,21 @@ pub fn calendar_id_from_caldav_href(href: &str) -> Option<String> {
     Some(id.to_string())
 }
 
+/// The ORGANIZER for the event written to the Meet account's calendar.
+///
+/// Google attaches a conference only to an event that calendar organizes; an
+/// event naming someone else as organizer is a copy, and Google drops the
+/// create request without an error. When the Meet account is not the host's
+/// booking address (a personal Google account, say), that calendar's own
+/// address is the organizer of its copy. Guests' invites keep the host's.
+pub fn meet_organizer_email(calendar_id: &str, host_email: &str) -> Option<String> {
+    let calendar_id = calendar_id.trim();
+    if !calendar_id.contains('@') || calendar_id.eq_ignore_ascii_case(host_email.trim()) {
+        return None;
+    }
+    Some(calendar_id.to_string())
+}
+
 /// JSON body for `events.patch` with `conferenceData.createRequest`.
 /// `conferenceDataVersion=1` is a query param, not a body field.
 pub fn conference_patch_body(request_id: &str) -> Value {
@@ -600,6 +615,14 @@ struct GoogleWriteSource {
     token_expires_at: Option<String>,
 }
 
+/// The Google source that creates this user's Meet links: the one they chose on
+/// the Sources page, else the first Google calendar bookings are written to.
+pub async fn meet_source_id_for_user(pool: &SqlitePool, user_id: &str) -> Option<String> {
+    google_write_source_for_user(pool, user_id)
+        .await
+        .map(|s| s.id)
+}
+
 async fn google_write_source_for_user(
     pool: &SqlitePool,
     user_id: &str,
@@ -608,13 +631,14 @@ async fn google_write_source_for_user(
         "SELECT cs.id, cs.url, cs.write_calendar_href, cs.access_token_enc, cs.token_expires_at
          FROM caldav_sources cs
          JOIN accounts a ON a.id = cs.account_id
+         JOIN users u ON u.id = a.user_id
          WHERE a.user_id = ?
            AND cs.enabled = 1
            AND cs.auth_type = 'oauth2'
            AND cs.oauth2_provider = 'google'
            AND cs.write_calendar_href IS NOT NULL
            AND TRIM(cs.write_calendar_href) != ''
-         ORDER BY cs.id
+         ORDER BY CASE WHEN cs.id = u.meet_source_id THEN 0 ELSE 1 END, cs.id
          LIMIT 1",
     )
     .bind(user_id)
@@ -682,7 +706,10 @@ pub async fn create_meet_for_booking_with_config(
         }
     };
 
-    let details = booking_details_for_meet(pool, booking_id, &owner_id).await?;
+    let mut details = booking_details_for_meet(pool, booking_id, &owner_id).await?;
+    if let Some(organizer) = meet_organizer_email(&calendar_id, &details.host_email) {
+        details.host_email = organizer;
+    }
     let ics = crate::email::generate_ics_caldav(&details);
 
     if let Err(e) = api
@@ -1380,6 +1407,8 @@ mod tests {
         omit_status_on_patch: bool,
         hangout: String,
         events: Mutex<HashMap<String, String>>,
+        /// The last ICS written to the Meet calendar.
+        last_ics: Mutex<String>,
     }
 
     impl FakeApi {
@@ -1395,6 +1424,7 @@ mod tests {
                 omit_status_on_patch: false,
                 hangout: hangout.to_string(),
                 events: Mutex::new(HashMap::new()),
+                last_ics: Mutex::new(String::new()),
             }
         }
     }
@@ -1407,9 +1437,10 @@ mod tests {
             _access_token: &str,
             _calendar_href: &str,
             uid: &str,
-            _ics: &str,
+            ics: &str,
         ) -> Result<()> {
             self.put_count.fetch_add(1, Ordering::SeqCst);
+            *self.last_ics.lock().unwrap() = ics.to_string();
             self.events
                 .lock()
                 .unwrap()
@@ -2028,6 +2059,114 @@ mod tests {
         assert_eq!(url.as_deref(), Some("https://meet.google.com/created-room"));
         assert_eq!(api.put_count.load(Ordering::SeqCst), 1);
         assert_eq!(api.conference_patches.load(Ordering::SeqCst), 1);
+    }
+
+    #[test]
+    fn meet_organizer_email_is_the_meet_calendar_when_it_differs() {
+        assert_eq!(
+            meet_organizer_email("alice@gmail.com", "alice@work.example.com").as_deref(),
+            Some("alice@gmail.com")
+        );
+        assert_eq!(
+            meet_organizer_email("Alice@Gmail.com", "alice@gmail.com"),
+            None
+        );
+        assert_eq!(
+            meet_organizer_email("abc@group.calendar.google.com", "alice@work.example.com")
+                .as_deref(),
+            Some("abc@group.calendar.google.com")
+        );
+        assert_eq!(
+            meet_organizer_email("not-an-address", "alice@work.example.com"),
+            None
+        );
+    }
+
+    #[tokio::test]
+    async fn meet_event_is_organized_by_the_meet_account() {
+        let pool = memory_pool().await;
+        let alice = insert_user(&pool, "alice@work.example.com", "Alice").await;
+        let source_id = insert_google_source(&pool, &alice, true).await;
+        let et = insert_event_type(&pool, &alice, None, "round_robin", "google_meet").await;
+        let (bid, _) = insert_booking(&pool, &et, None, None).await;
+        let key = [0u8; 32];
+        seed_access_token(&pool, &source_id, &key).await;
+        let api = FakeApi::new("https://meet.google.com/organized-room");
+        let url = create_meet_for_booking_with_config(
+            &pool,
+            &key,
+            &bid,
+            &api,
+            &AttachConfig {
+                max_attempts: 2,
+                retry_delay: std::time::Duration::ZERO,
+            },
+        )
+        .await;
+        assert_eq!(
+            url.as_deref(),
+            Some("https://meet.google.com/organized-room")
+        );
+        let ics = api.last_ics.lock().unwrap().clone();
+        let organizer = ics
+            .lines()
+            .find(|l| l.starts_with("ORGANIZER"))
+            .unwrap_or_default()
+            .to_string();
+        assert!(
+            organizer.ends_with(":mailto:alice@gmail.com"),
+            "Google only attaches Meet to an event its own calendar organizes: {organizer}"
+        );
+    }
+
+    #[tokio::test]
+    async fn chosen_meet_account_wins_over_the_first_google_calendar() {
+        let pool = memory_pool().await;
+        let alice = insert_user(&pool, "alice@choose.example.com", "Alice").await;
+        let first = insert_google_source(&pool, &alice, true).await;
+        let second = insert_google_source(&pool, &alice, true).await;
+        let (lo, hi) = if first < second {
+            (first, second)
+        } else {
+            (second, first)
+        };
+        assert_eq!(
+            meet_source_id_for_user(&pool, &alice).await.as_deref(),
+            Some(lo.as_str())
+        );
+
+        sqlx::query("UPDATE users SET meet_source_id = ? WHERE id = ?")
+            .bind(&hi)
+            .bind(&alice)
+            .execute(&pool)
+            .await
+            .unwrap();
+        assert_eq!(
+            meet_source_id_for_user(&pool, &alice).await.as_deref(),
+            Some(hi.as_str())
+        );
+
+        let et = insert_event_type(&pool, &alice, None, "round_robin", "google_meet").await;
+        let (_, uid) = insert_booking(
+            &pool,
+            &et,
+            None,
+            Some("https://meet.google.com/aaa-bbbb-ccc"),
+        )
+        .await;
+        assert!(should_skip_caldav_put(&pool, &uid, &alice, &hi, "oauth2", Some("google")).await);
+        assert!(!should_skip_caldav_put(&pool, &uid, &alice, &lo, "oauth2", Some("google")).await);
+
+        // A chosen account that no longer has a write calendar falls back.
+        sqlx::query("UPDATE caldav_sources SET write_calendar_href = NULL WHERE id = ?")
+            .bind(&hi)
+            .execute(&pool)
+            .await
+            .unwrap();
+        assert_eq!(
+            meet_source_id_for_user(&pool, &alice).await.as_deref(),
+            Some(lo.as_str())
+        );
     }
 
     /// Seed a decryptable access token so the retry tests reach the fake API

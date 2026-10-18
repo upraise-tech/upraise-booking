@@ -459,6 +459,9 @@ sources-remove-confirm = Kas eemaldada allikas „{ $name }“? See kustutab kõ
 sources-no-write-calendar = Kirjutamiskalendrit pole valitud. Kinnitatud broneeringud jäävad calrsi ega jõua sellesse kalendrisse. Kirjutamise sisselülitamiseks vali allpool üks.
 sources-write-bookings-to = Kirjuta broneeringud kalendrisse:
 sources-write-none = Mitte ükski (ära kirjuta)
+sources-meet-heading = Google Meeti lingid
+sources-meet-help = Siin valitud Google'i konto loob sinu broneeringute Meeti lingi, nii et kehtib selle konto Meeti pakett (salvestamine, pikemad kohtumised). Loendis on ainult Google'i kalendrid, kuhu broneeringud kirjutatakse.
+sources-meet-account = Loo Meeti lingid kontoga:
 sources-empty = Ühtegi kalendriallikat pole ühendatud. { $link }, et saadavust kontrollida.
 sources-empty-link-label = Lisa üks
 
