@@ -653,6 +653,7 @@ pub async fn create_router(pool: SqlitePool, data_dir: PathBuf, secret_key: [u8;
         )
         .route("/dashboard/sources/{id}/remove", post(remove_source))
         .route("/dashboard/sources/{id}/test", post(test_source))
+        .route("/dashboard/sources/meet-account", post(set_meet_account))
         .route("/dashboard/sources/google/connect", get(google_connect))
         .route("/dashboard/sources/google/callback", get(google_callback))
         .route("/dashboard/sources/{id}/sync", post(sync_source))

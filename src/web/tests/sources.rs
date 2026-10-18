@@ -184,3 +184,101 @@ async fn update_source_404_for_other_user_source() {
     // Handler redirects to /dashboard/sources for unauthorised access.
     assert!(response.status().is_redirection());
 }
+
+async fn seed_google_source(pool: &SqlitePool, id: &str, account: &str, with_write: bool) {
+    let account_id: String = sqlx::query_scalar(
+        "SELECT a.id FROM accounts a JOIN users u ON u.id = a.user_id WHERE u.email = 'test@example.com' LIMIT 1",
+    )
+    .fetch_one(pool)
+    .await
+    .unwrap();
+    let enc = account.replace('@', "%40");
+    let href = with_write
+        .then(|| format!("https://apidata.googleusercontent.com/caldav/v2/{enc}/events/"));
+    sqlx::query(
+        "INSERT INTO caldav_sources (id, account_id, name, url, username, auth_type, oauth2_provider, access_token_enc, write_calendar_href, enabled)
+         VALUES (?, ?, 'Google Calendar', ?, ?, 'oauth2', 'google', 'tok', ?, 1)",
+    )
+    .bind(id)
+    .bind(&account_id)
+    .bind(format!("https://apidata.googleusercontent.com/caldav/v2/{enc}/user"))
+    .bind(account)
+    .bind(href)
+    .execute(pool)
+    .await
+    .unwrap();
+}
+
+#[tokio::test]
+async fn sources_page_lets_the_user_pick_the_meet_account() {
+    let (app, pool, session, _) = setup_test_app().await;
+    let a = "00000000-0000-4000-8000-0000000000a1";
+    let b = "00000000-0000-4000-8000-0000000000b2";
+    let c = "00000000-0000-4000-8000-0000000000c3";
+    seed_google_source(&pool, a, "work@example.com", true).await;
+    seed_google_source(&pool, b, "pro@gmail.com", true).await;
+    seed_google_source(&pool, c, "readonly@gmail.com", false).await;
+
+    let body = body_string(
+        app.clone()
+            .oneshot(get_authed("/dashboard/sources", &session))
+            .await
+            .unwrap(),
+    )
+    .await;
+    assert!(
+        body.contains("meet-account-select"),
+        "Meet account card is shown"
+    );
+    assert!(body.contains("pro@gmail.com</option>"));
+    assert!(
+        !body.contains("readonly@gmail.com</option>"),
+        "a Google calendar bookings are not written to cannot hold the Meet"
+    );
+
+    // Not eligible: no write calendar. Nothing changes.
+    let csrf = "test-csrf-meet";
+    let response = app
+        .clone()
+        .oneshot(post_form(
+            "/dashboard/sources/meet-account",
+            &session,
+            csrf,
+            &format!("_csrf={csrf}&source_id={c}"),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 303);
+    let chosen: Option<String> =
+        sqlx::query_scalar("SELECT meet_source_id FROM users WHERE email = 'test@example.com'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(chosen, None);
+
+    let response = app
+        .clone()
+        .oneshot(post_form(
+            "/dashboard/sources/meet-account",
+            &session,
+            csrf,
+            &format!("_csrf={csrf}&source_id={b}"),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 303);
+    let chosen: Option<String> =
+        sqlx::query_scalar("SELECT meet_source_id FROM users WHERE email = 'test@example.com'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(chosen.as_deref(), Some(b));
+
+    let body = body_string(
+        app.oneshot(get_authed("/dashboard/sources", &session))
+            .await
+            .unwrap(),
+    )
+    .await;
+    assert!(body.contains(&format!("value=\"{b}\" selected>")));
+}

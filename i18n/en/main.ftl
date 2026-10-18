@@ -460,6 +460,9 @@ sources-remove-confirm = Remove source '{ $name }'? This will delete all synced 
 sources-no-write-calendar = No write calendar selected. Confirmed bookings stay in Upraise Booking and are not pushed to this calendar. Pick one below to enable write-back.
 sources-write-bookings-to = Write bookings to:
 sources-write-none = None (don't write)
+sources-meet-heading = Google Meet links
+sources-meet-help = The Google account chosen here creates the Meet link for your bookings, so its Meet plan applies (recording, longer calls). Only Google calendars that bookings are written to are listed.
+sources-meet-account = Create Meet links with:
 sources-empty = No calendar sources connected. { $link } to check availability.
 sources-empty-link-label = Add one
 

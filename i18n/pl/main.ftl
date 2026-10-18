@@ -461,6 +461,9 @@ sources-remove-confirm = Usunąć źródło „{ $name }”? Skasuje to wszystki
 sources-no-write-calendar = Nie wybrano kalendarza do zapisu. Potwierdzone rezerwacje zostają w Upraise Booking i nie trafiają do tego kalendarza. Wybierz jeden poniżej, aby włączyć zapis.
 sources-write-bookings-to = Zapisuj rezerwacje w:
 sources-write-none = Żaden (nie zapisuj)
+sources-meet-heading = Linki Google Meet
+sources-meet-help = Wybrane tutaj konto Google tworzy link Meet do twoich rezerwacji, więc obowiązuje jego plan Meet (nagrywanie, dłuższe spotkania). Na liście są tylko kalendarze Google, do których zapisywane są rezerwacje.
+sources-meet-account = Twórz linki Meet za pomocą:
 sources-empty = Nie podłączono żadnych źródeł kalendarza. { $link }, aby sprawdzać dostępność.
 sources-empty-link-label = Dodaj jedno
 

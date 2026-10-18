@@ -95,6 +95,38 @@ pub(super) async fn dashboard_sources(
         )
         .collect();
 
+    // Google accounts that can create this user's Meet links: an enabled
+    // Google connection with a calendar bookings are written to.
+    let meet_rows: Vec<(String, String, String)> = sqlx::query_as(
+        "SELECT cs.id, cs.url, cs.write_calendar_href FROM caldav_sources cs
+         JOIN accounts a ON a.id = cs.account_id
+         WHERE a.user_id = ?
+           AND cs.enabled = 1
+           AND cs.auth_type = 'oauth2'
+           AND cs.oauth2_provider = 'google'
+           AND cs.write_calendar_href IS NOT NULL
+           AND TRIM(cs.write_calendar_href) != ''
+         ORDER BY cs.id",
+    )
+    .bind(&user.id)
+    .fetch_all(&state.pool)
+    .await
+    .unwrap_or_default();
+    let meet_current = crate::google_meet::meet_source_id_for_user(&state.pool, &user.id).await;
+    let meet_sources: Vec<minijinja::Value> = meet_rows
+        .iter()
+        .map(|(id, url, href)| {
+            let label = crate::google_meet::calendar_id_from_caldav_href(url)
+                .or_else(|| crate::google_meet::calendar_id_from_caldav_href(href))
+                .unwrap_or_else(|| url.clone());
+            context! {
+                id => id,
+                label => label,
+                selected => meet_current.as_deref() == Some(id.as_str()),
+            }
+        })
+        .collect();
+
     let tmpl = match state.templates.get_template("dashboard_sources.html") {
         Ok(t) => t,
         Err(e) => return internal_error_html("template render", &e),
@@ -107,6 +139,7 @@ pub(super) async fn dashboard_sources(
             sidebar => sidebar_context(&auth_user, "sources"),
             lang => auth_user.lang,
             sources => sources_ctx,
+            meet_sources => meet_sources,
             impersonating => impersonating,
             impersonating_name => impersonating_name,
         })
@@ -1228,6 +1261,54 @@ pub(super) async fn set_write_calendar(
         .await;
 
     tracing::info!(source_id = %source_id, "write calendar configured");
+
+    Redirect::to("/dashboard/sources").into_response()
+}
+
+#[derive(Deserialize)]
+pub(super) struct MeetAccountForm {
+    _csrf: Option<String>,
+    source_id: String,
+}
+
+/// Choose which connected Google account creates this user's Meet links.
+pub(super) async fn set_meet_account(
+    State(state): State<Arc<AppState>>,
+    auth_user: crate::auth::AuthUser,
+    headers: HeaderMap,
+    Form(form): Form<MeetAccountForm>,
+) -> impl IntoResponse {
+    if let Err(resp) = verify_csrf_token(&headers, &form._csrf) {
+        return resp;
+    }
+    let user = &auth_user.user;
+
+    // Only this user's Google connections that bookings are written to: the
+    // Meet event lives on that calendar.
+    let eligible: Option<(String,)> = sqlx::query_as(
+        "SELECT cs.id FROM caldav_sources cs
+         JOIN accounts a ON a.id = cs.account_id
+         WHERE cs.id = ? AND a.user_id = ?
+           AND cs.enabled = 1
+           AND cs.auth_type = 'oauth2'
+           AND cs.oauth2_provider = 'google'
+           AND cs.write_calendar_href IS NOT NULL
+           AND TRIM(cs.write_calendar_href) != ''",
+    )
+    .bind(&form.source_id)
+    .bind(&user.id)
+    .fetch_optional(&state.pool)
+    .await
+    .unwrap_or(None);
+
+    if eligible.is_some() {
+        let _ = sqlx::query("UPDATE users SET meet_source_id = ? WHERE id = ?")
+            .bind(&form.source_id)
+            .bind(&user.id)
+            .execute(&state.pool)
+            .await;
+        tracing::info!(source_id = %form.source_id, "google meet account chosen");
+    }
 
     Redirect::to("/dashboard/sources").into_response()
 }

@@ -459,6 +459,9 @@ sources-remove-confirm = Quelle „{ $name }“ entfernen? Dabei werden alle von
 sources-no-write-calendar = Kein Schreibkalender ausgewählt. Bestätigte Buchungen bleiben in Upraise Booking und werden nicht in diesen Kalender übertragen. Wähle unten einen aus, um das Rückschreiben zu aktivieren.
 sources-write-bookings-to = Buchungen schreiben nach:
 sources-write-none = Keiner (nicht schreiben)
+sources-meet-heading = Google-Meet-Links
+sources-meet-help = Das hier gewählte Google-Konto erstellt den Meet-Link für deine Buchungen, daher gilt sein Meet-Tarif (Aufzeichnung, längere Besprechungen). Angezeigt werden nur Google-Kalender, in die Buchungen geschrieben werden.
+sources-meet-account = Meet-Links erstellen mit:
 sources-empty = Keine Kalenderquellen verbunden. { $link }, um die Verfügbarkeit zu prüfen.
 sources-empty-link-label = Füge eine hinzu
 

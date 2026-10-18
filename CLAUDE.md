@@ -57,7 +57,7 @@ Migrations are tracked via `_migrations` table and run incrementally at startup 
 
 Key tables:
 
-- **`users`** — multi-user: email, name, password_hash (argon2), role (admin/user), auth_provider (local/oidc), oidc_subject, username (unique), enabled flag, title, bio, avatar_path, language (saved UI language, NULL = browser), public_page_language ('visitor' or 'host', language of the user's /u/ pages)
+- **`users`** — multi-user: email, name, password_hash (argon2), role (admin/user), auth_provider (local/oidc), oidc_subject, username (unique), enabled flag, title, bio, avatar_path, language (saved UI language, NULL = browser), public_page_language ('visitor' or 'host', language of the user's /u/ pages), meet_source_id (the Google source that creates the user's Meet links, chosen on the Sources page; NULL = the first Google source with a write calendar)
 - **`sessions`** — server-side sessions: token (PK), user_id, expires_at (30-day TTL)
 - **`auth_config`** — singleton: registration_enabled, allowed_email_domains, OIDC settings (issuer, client_id, client_secret, auto_register)
 - **`accounts`** — scheduling accounts linked to users via `user_id`

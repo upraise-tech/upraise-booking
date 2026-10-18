@@ -459,6 +459,9 @@ sources-remove-confirm = Remover a fonte «{ $name }»? Isso apagará todos os e
 sources-no-write-calendar = Nenhuma agenda de gravação selecionada. Os agendamentos confirmados ficam no Upraise Booking e não são enviados para esta agenda. Escolha uma abaixo para ativar a gravação.
 sources-write-bookings-to = Gravar os agendamentos em:
 sources-write-none = Nenhuma (não gravar)
+sources-meet-heading = Links do Google Meet
+sources-meet-help = A conta do Google escolhida aqui cria o link do Meet das suas reservas, então vale o plano do Meet dessa conta (gravação, reuniões mais longas). Só aparecem as agendas do Google em que as reservas são gravadas.
+sources-meet-account = Criar links do Meet com:
 sources-empty = Nenhuma fonte de agenda conectada. { $link } para verificar a disponibilidade.
 sources-empty-link-label = Adicione uma
 

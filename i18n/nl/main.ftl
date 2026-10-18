@@ -460,6 +460,9 @@ sources-remove-confirm = Bron '{ $name }' verwijderen? Hiermee worden alle gesyn
 sources-no-write-calendar = Geen agenda gekozen om naar te schrijven. Bevestigde boekingen blijven in Upraise Booking en worden niet naar deze agenda gezet. Kies hieronder een agenda om terugschrijven in te schakelen.
 sources-write-bookings-to = Boekingen schrijven naar:
 sources-write-none = Geen (niet schrijven)
+sources-meet-heading = Google Meet-links
+sources-meet-help = Het Google-account dat je hier kiest maakt de Meet-link voor je boekingen, dus het Meet-abonnement van dat account geldt (opnemen, langere gesprekken). Alleen Google-agenda's waar boekingen naartoe worden geschreven staan in de lijst.
+sources-meet-account = Meet-links maken met:
 sources-empty = Geen agendabronnen gekoppeld. { $link } om beschikbaarheid te controleren.
 sources-empty-link-label = Voeg er een toe
 
