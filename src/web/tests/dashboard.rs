@@ -718,3 +718,22 @@ async fn dashboard_bookings_shows_guest_phone_while_pending() {
     let body = body_string(response).await;
     assert!(body.contains("Pending Guest") && !body.contains("+15550000002"));
 }
+
+#[tokio::test]
+async fn settings_page_keeps_a_saved_timezone_outside_the_list() {
+    let (app, pool, session, _) = setup_test_app().await;
+    sqlx::query("UPDATE users SET timezone = 'Asia/Karachi' WHERE email = 'test@example.com'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    let response = app
+        .oneshot(get_authed("/dashboard/settings", &session))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 200);
+    let body = body_string(response).await;
+    assert!(
+        body.contains("Karachi\" selected>"),
+        "the saved timezone must be offered and selected, or saving the form changes it"
+    );
+}

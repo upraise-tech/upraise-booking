@@ -2812,3 +2812,23 @@ fn horizon_last_date_survives_an_absurdly_large_horizon() {
         "a horizon past the representable calendar is effectively unlimited"
     );
 }
+
+#[test]
+fn common_timezones_cover_the_middle_east() {
+    let zones: Vec<String> = common_timezones_with("")
+        .into_iter()
+        .map(|(iana, _)| iana)
+        .collect();
+    for tz in [
+        "Africa/Cairo",
+        "Asia/Riyadh",
+        "Asia/Qatar",
+        "Asia/Dubai",
+        "Asia/Amman",
+    ] {
+        assert!(
+            zones.iter().any(|z| z == tz),
+            "{tz} missing from the timezone list"
+        );
+    }
+}
