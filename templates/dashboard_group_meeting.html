@@ -29,6 +29,12 @@
   .gm-share { display: flex; gap: 0.4rem; flex-wrap: wrap; }
   .gm-share input { flex: 1 1 260px; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2, var(--surface)); color: var(--text); font: inherit; font-size: 0.8rem; }
   .gm-btn { background: var(--accent); color: #fff; border: 0; border-radius: var(--radius); padding: 0.5rem 0.85rem; font: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-decoration: none; }
+  .gm-length { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+  .gm-length .gm-select { flex: 1 1 220px; width: auto; }
+  .gm-len-other { display: inline-flex; gap: 0.4rem; align-items: center; }
+  .gm-len-other[hidden] { display: none; }
+  .gm-len-other input { width: 7.5rem; padding: 0.5rem 0.6rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font: inherit; font-size: 0.9rem; }
+  .gm-error { color: var(--danger, #dc2626); }
   .gm-note { padding: 0.75rem 0.9rem; border-radius: var(--radius); background: var(--surface-2, var(--surface)); border: 1px solid var(--border); font-size: 0.875rem; }
 </style>
 <div class="card">
@@ -80,6 +86,24 @@
         </select>
         <p class="gm-hint">{{ t("gm-meeting-type-hint", name=owner_name) }}</p>
 
+        <p class="gm-label" style="margin-top: 1.1rem;">{{ t("gm-length") }}</p>
+        {% set preset_hit = custom_len and custom_len in len_presets %}
+        <div class="gm-length">
+          <select class="gm-select" id="gm-len" aria-label="{{ t('gm-length') }}">
+            <option value="" {% if not custom_len and not len_invalid %}selected{% endif %}>{{ t("gm-length-default", minutes=et_duration) }}</option>
+            {% for m in len_presets %}{% if m != et_duration %}
+            <option value="{{ m }}" {% if custom_len == m %}selected{% endif %}>{{ t("invite-links-duration", minutes=m) }}</option>
+            {% endif %}{% endfor %}
+            <option value="other" {% if (custom_len and not preset_hit) or len_invalid %}selected{% endif %}>{{ t("gm-length-other") }}</option>
+          </select>
+          <span class="gm-len-other" id="gm-len-other" {% if not ((custom_len and not preset_hit) or len_invalid) %}hidden{% endif %}>
+            <input type="number" id="gm-len-minutes" min="{{ len_min }}" max="{{ len_max }}" step="{{ len_step }}" value="{{ len_value }}" aria-label="{{ t('gm-length-minutes') }}" placeholder="{{ t('gm-length-minutes') }}">
+            <button type="button" class="gm-btn" id="gm-len-apply">{{ t("gm-length-apply") }}</button>
+          </span>
+        </div>
+        {% if len_invalid %}<p class="gm-hint gm-error">{{ t("gm-length-invalid", min=len_min, max=len_max, step=len_step) }}</p>{% endif %}
+        <p class="gm-hint">{{ t("gm-length-hint") }}</p>
+
         {% if meet_blocked %}
           <div class="gm-note">{{ t("google-meet-dynamic-group-unavailable") }}</div>
         {% else %}
@@ -121,6 +145,13 @@
     if (!document.getElementById('gm-include-me').checked) params.set('me', '0');
     var et = document.getElementById('gm-et');
     if (et) params.set('et', et.value);
+    var len = document.getElementById('gm-len');
+    if (len && len.value === 'other') {
+      var mins = document.getElementById('gm-len-minutes').value.trim();
+      if (mins) params.set('len', mins);
+    } else if (len && len.value) {
+      params.set('len', len.value);
+    }
     location.href = '/dashboard/group-meeting' + (params.toString() ? '?' + params.toString() : '');
   }
   document.querySelectorAll('.gm-pick').forEach(function(b) { b.addEventListener('change', go); });
@@ -131,6 +162,23 @@
   });
   var et = document.getElementById('gm-et');
   if (et) et.addEventListener('change', go);
+
+  var lenSel = document.getElementById('gm-len');
+  var lenOther = document.getElementById('gm-len-other');
+  var lenMinutes = document.getElementById('gm-len-minutes');
+  if (lenSel) lenSel.addEventListener('change', function() {
+    if (lenSel.value === 'other') {
+      lenOther.hidden = false;
+      lenMinutes.focus();
+    } else {
+      go();
+    }
+  });
+  if (lenMinutes) lenMinutes.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { e.preventDefault(); go(); }
+  });
+  var lenApply = document.getElementById('gm-len-apply');
+  if (lenApply) lenApply.addEventListener('click', go);
 
   var search = document.getElementById('gm-search');
   search.addEventListener('input', function() {

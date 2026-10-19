@@ -335,3 +335,250 @@ async fn migration_turns_extra_guests_on_for_existing_event_types() {
     assert_eq!(get(et_id).await, 10, "switched off becomes up to 10");
     assert_eq!(get(five).await, 5, "a limit the host chose stays");
 }
+
+// --- Custom group meeting length ---
+
+const TEST_KEY: [u8; 32] = [0u8; 32];
+
+fn people(names: &[&str]) -> Vec<String> {
+    names.iter().map(|s| s.to_string()).collect()
+}
+
+#[test]
+fn group_length_signature_round_trips_and_refuses_edits() {
+    let who = people(&["testuser", "bob"]);
+    let sig = group_length_sig(&TEST_KEY, &who, "test-meeting", 45);
+    assert_eq!(sig.len(), 16);
+    let check = |who: &[String], slug: &str, len: &str, sig: &str| {
+        verified_group_length(&TEST_KEY, who, slug, Some(len), Some(sig))
+    };
+    assert_eq!(check(&who, "test-meeting", "45", &sig), Some(45));
+    assert_eq!(
+        check(&people(&["TestUser", "Bob"]), "Test-Meeting", "45", &sig),
+        Some(45),
+        "usernames and slugs are case-insensitive in links"
+    );
+    assert_eq!(
+        check(&who, "test-meeting", "60", &sig),
+        None,
+        "another length"
+    );
+    assert_eq!(
+        check(&who, "other", "45", &sig),
+        None,
+        "another meeting type"
+    );
+    assert_eq!(
+        check(&people(&["testuser", "carol"]), "test-meeting", "45", &sig),
+        None,
+        "other people"
+    );
+    assert_eq!(
+        check(&people(&["bob", "testuser"]), "test-meeting", "45", &sig),
+        None,
+        "another lead"
+    );
+    let mut edited = sig.clone();
+    edited.replace_range(0..1, if sig.starts_with('0') { "1" } else { "0" });
+    assert_eq!(check(&who, "test-meeting", "45", &edited), None);
+    assert_eq!(check(&who, "test-meeting", "45", "zz"), None);
+    assert_eq!(check(&who, "test-meeting", "45", &sig[..8]), None);
+    assert_eq!(
+        verified_group_length(&TEST_KEY, &who, "test-meeting", None, Some(&sig)),
+        None
+    );
+    assert_eq!(
+        verified_group_length(&TEST_KEY, &who, "test-meeting", Some("45"), None),
+        None
+    );
+    let other_key = [1u8; 32];
+    assert_eq!(
+        verified_group_length(&other_key, &who, "test-meeting", Some("45"), Some(&sig)),
+        None,
+        "another instance's key"
+    );
+}
+
+#[test]
+fn group_length_bounds() {
+    assert!(valid_group_length(5));
+    assert!(valid_group_length(45));
+    assert!(valid_group_length(480));
+    assert!(!valid_group_length(0));
+    assert!(!valid_group_length(7));
+    assert!(!valid_group_length(485));
+    assert!(!valid_group_length(-30));
+    let who = people(&["a", "b"]);
+    let sig = group_length_sig(&TEST_KEY, &who, "x", 7);
+    assert_eq!(
+        verified_group_length(&TEST_KEY, &who, "x", Some("7"), Some(&sig)),
+        None,
+        "a signed but invalid length is still refused"
+    );
+    assert_eq!(group_length_params(&TEST_KEY, &who, "x", None), "");
+    assert!(group_length_params(&TEST_KEY, &who, "x", Some(45)).starts_with("&len=45&ls="));
+}
+
+#[tokio::test]
+async fn group_meeting_custom_length_goes_into_every_link() {
+    let (app, pool, session, _) = setup_test_app().await;
+    insert_test_user_with_session(&pool, "Bob Builder", "bob@example.com", "bob").await;
+    let sig = group_length_sig(&TEST_KEY, &people(&["testuser", "bob"]), "test-meeting", 45);
+
+    let response = app
+        .clone()
+        .oneshot(get_authed(
+            "/dashboard/group-meeting?with=bob&len=45",
+            &session,
+        ))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 200);
+    let body = unescaped(body_string(response).await);
+    assert!(
+        body.contains(&format!("/u/testuser+bob/test-meeting?len=45&ls={sig}")),
+        "the guest link carries the signed length"
+    );
+    assert!(
+        body.contains(&format!("&len=45&ls={sig}\"")),
+        "each common time books that length"
+    );
+    assert!(body.contains("/u/testuser+bob/test-meeting/book?date="));
+    assert!(body.contains(r#"<option value="45" selected"#));
+
+    // The meeting type's own length needs no custom length in the link.
+    let response = app
+        .clone()
+        .oneshot(get_authed(
+            "/dashboard/group-meeting?with=bob&len=30",
+            &session,
+        ))
+        .await
+        .unwrap();
+    let body = unescaped(body_string(response).await);
+    assert!(!body.contains("len=30"));
+    assert!(body.contains("/u/testuser+bob/test-meeting/book?date="));
+
+    // A length the page can't use is refused, and the type's own applies.
+    let response = app
+        .oneshot(get_authed(
+            "/dashboard/group-meeting?with=bob&len=7",
+            &session,
+        ))
+        .await
+        .unwrap();
+    let body = unescaped(body_string(response).await);
+    assert!(body.contains("Pick a length from 5 to 480 minutes"));
+    assert!(!body.contains("len=7&"));
+    assert!(body.contains("/u/testuser+bob/test-meeting/book?date="));
+}
+
+#[tokio::test]
+async fn group_link_pages_keep_the_signed_length() {
+    let (app, pool, _, _) = setup_test_app().await;
+    insert_test_user_with_session(&pool, "Bob Builder", "bob@example.com", "bob").await;
+    let sig = group_length_sig(&TEST_KEY, &people(&["testuser", "bob"]), "test-meeting", 45);
+
+    let response = app
+        .clone()
+        .oneshot(get(&format!(
+            "/u/testuser+bob/test-meeting?len=45&ls={sig}"
+        )))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 200);
+    let body = unescaped(body_string(response).await);
+    assert!(
+        body.contains(&format!(
+            "var lengthParams = \"\\u0026len=45\\u0026ls={sig}\""
+        )),
+        "the slot page passes the length on to the booking form"
+    );
+
+    let date = far_future_monday();
+    let response = app
+        .clone()
+        .oneshot(get(&format!(
+            "/u/testuser+bob/test-meeting/book?date={date}&time=10:00&tz=UTC&len=45&ls={sig}"
+        )))
+        .await
+        .unwrap();
+    let body = unescaped(body_string(response).await);
+    assert!(body.contains(r#"<input type="hidden" name="len" value="45">"#));
+    assert!(body.contains(&format!(r#"<input type="hidden" name="ls" value="{sig}">"#)));
+    assert!(body.contains("10:45"), "the form shows the custom end time");
+
+    // An edited length is ignored: the type's own 30 minutes apply.
+    let response = app
+        .oneshot(get(&format!(
+            "/u/testuser+bob/test-meeting/book?date={date}&time=10:00&tz=UTC&len=240&ls={sig}"
+        )))
+        .await
+        .unwrap();
+    let body = unescaped(body_string(response).await);
+    assert!(!body.contains(r#"name="len""#));
+    assert!(body.contains("10:30"));
+}
+
+async fn booked_minutes(pool: &SqlitePool, et_id: &str) -> i64 {
+    let (start, end): (String, String) =
+        sqlx::query_as("SELECT start_at, end_at FROM bookings WHERE event_type_id = ?")
+            .bind(et_id)
+            .fetch_one(pool)
+            .await
+            .unwrap();
+    let parse = |s: &str| {
+        chrono::DateTime::parse_from_rfc3339(s)
+            .map(|d| d.naive_utc())
+            .or_else(|_| {
+                NaiveDateTime::parse_from_str(s.trim_end_matches('Z'), "%Y-%m-%dT%H:%M:%S")
+            })
+            .unwrap()
+    };
+    (parse(&end) - parse(&start)).num_minutes()
+}
+
+#[tokio::test]
+async fn group_booking_takes_the_signed_length() {
+    let (app, pool, _, et_id) = setup_test_app().await;
+    let (bob, _) =
+        insert_test_user_with_session(&pool, "Bob Builder", "bob@example.com", "bob").await;
+    insert_personal_et(&pool, &bob, "bob-intro").await;
+    let sig = group_length_sig(&TEST_KEY, &people(&["testuser", "bob"]), "test-meeting", 45);
+
+    let csrf = "csrf-group-length";
+    let response = app
+        .oneshot(post_form_unauthed(
+            "/u/testuser+bob/test-meeting/book",
+            csrf,
+            // 45-minute slots start at 09:00, 09:45, 10:30...
+            &format!(
+                "{}&len=45&ls={sig}",
+                book_body(csrf).replace("time=10:00", "time=09:45")
+            ),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 200);
+    assert_eq!(booked_minutes(&pool, &et_id).await, 45);
+}
+
+#[tokio::test]
+async fn group_booking_ignores_an_unsigned_length() {
+    let (app, pool, _, et_id) = setup_test_app().await;
+    let (bob, _) =
+        insert_test_user_with_session(&pool, "Bob Builder", "bob@example.com", "bob").await;
+    insert_personal_et(&pool, &bob, "bob-intro").await;
+
+    let csrf = "csrf-group-length-bad";
+    let response = app
+        .oneshot(post_form_unauthed(
+            "/u/testuser+bob/test-meeting/book",
+            csrf,
+            &format!("{}&len=240&ls=0000000000000000", book_body(csrf)),
+        ))
+        .await
+        .unwrap();
+    assert_eq!(response.status(), 200);
+    assert_eq!(booked_minutes(&pool, &et_id).await, 30);
+}

@@ -973,6 +973,16 @@ async fn handle_dynamic_group_booking(
         return render_booking_action_error_in(state, lang, &title, &message);
     }
 
+    // A group meeting link may carry a custom length, signed by the member who made it.
+    let duration = verified_group_length(
+        &state.secret_key,
+        &usernames,
+        slug,
+        form.len.as_deref(),
+        form.ls.as_deref(),
+    )
+    .unwrap_or(duration);
+
     let needs_approval = requires_confirmation != 0;
 
     // Parse additional guests
@@ -2118,6 +2128,11 @@ pub(super) struct BookForm {
     /// `sms_phone_mode` set; ignored otherwise even if posted.
     #[serde(default)]
     phone: Option<String>,
+    /// A custom group meeting length and its signature (dynamic group links only).
+    #[serde(default)]
+    len: Option<String>,
+    #[serde(default)]
+    ls: Option<String>,
 }
 
 /// Whether `user` may put an event type into an SMS-sending mode.

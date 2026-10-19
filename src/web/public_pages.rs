@@ -964,6 +964,16 @@ async fn show_dynamic_group_slots(
         return html;
     }
 
+    let custom_len = verified_group_length(
+        &state.secret_key,
+        &usernames,
+        slug,
+        query.len.as_deref(),
+        query.ls.as_deref(),
+    );
+    let duration = custom_len.unwrap_or(duration);
+    let length_params = group_length_params(&state.secret_key, &usernames, slug, custom_len);
+
     // Build combined host display name
     let host_name = dg_users
         .iter()
@@ -1108,6 +1118,7 @@ async fn show_dynamic_group_slots(
             invite_token => "",
             invite_guest_name => "",
             invite_guest_email => "",
+            length_params => length_params,
             default_calendar_view => default_calendar_view,
             deferred_load => !is_deferred_callback,
             company_link => state.company_link.read().await.clone(),
@@ -1197,6 +1208,18 @@ async fn show_dynamic_group_book_form(
         return html;
     }
 
+    let custom_len = verified_group_length(
+        &state.secret_key,
+        &usernames,
+        slug,
+        query.len.as_deref(),
+        query.ls.as_deref(),
+    );
+    let duration = custom_len.unwrap_or(duration);
+    let length_sig = custom_len
+        .map(|m| group_length_sig(&state.secret_key, &usernames, slug, m))
+        .unwrap_or_default();
+
     let host_name = dg_users
         .iter()
         .map(|(_, _, name, _, _)| name.as_str())
@@ -1266,6 +1289,8 @@ async fn show_dynamic_group_book_form(
             form_email => "",
             form_notes => "",
             invite_token => "",
+            group_len => custom_len,
+            group_len_sig => length_sig,
             max_additional_guests => max_additional_guests,
             company_link => state.company_link.read().await.clone(),
             captcha_enabled => captcha.enabled,
@@ -1844,6 +1869,11 @@ pub(super) struct SlotsQuery {
     theme: Option<String>,
     #[serde(default)]
     brand: Option<String>,
+    /// A custom group meeting length and its signature (dynamic group links only).
+    #[serde(default)]
+    len: Option<String>,
+    #[serde(default)]
+    ls: Option<String>,
 }
 
 impl SlotsQuery {
@@ -2176,6 +2206,11 @@ pub(super) struct BookQuery {
     theme: Option<String>,
     #[serde(default)]
     brand: Option<String>,
+    /// A custom group meeting length and its signature (dynamic group links only).
+    #[serde(default)]
+    len: Option<String>,
+    #[serde(default)]
+    ls: Option<String>,
 }
 
 impl BookQuery {
