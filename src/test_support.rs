@@ -14,7 +14,11 @@ pub(crate) static ENV_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_n
 
 /// The runtime-settings variables. Anything added here is also cleared and
 /// restored by [`EnvGuard`].
-const VARS: [&str; 2] = ["CALRS_BASE_URL", "CALRS_ALLOW_PRIVATE_HOSTS"];
+const VARS: [&str; 3] = [
+    "CALRS_BASE_URL",
+    "CALRS_ALLOW_PRIVATE_HOSTS",
+    "CALRS_OIDC_AUTO_REDIRECT",
+];
 
 /// Clears the runtime-settings env vars for the duration of a test and puts
 /// them back afterwards, so one test cannot leak an override into the next.

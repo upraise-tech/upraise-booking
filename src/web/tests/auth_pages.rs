@@ -248,6 +248,8 @@ async fn register_creates_user() {
 
 #[tokio::test]
 async fn login_page_hands_over_to_sso_when_auto_redirect_is_on() {
+    let _env = crate::test_support::ENV_LOCK.lock().await;
+    let _vars = crate::test_support::EnvGuard::new();
     let (app, pool, _, _) = setup_test_app().await;
     sqlx::query("UPDATE auth_config SET oidc_enabled = 1 WHERE id = 'singleton'")
         .execute(&pool)
@@ -267,7 +269,10 @@ async fn login_page_hands_over_to_sso_when_auto_redirect_is_on() {
         .unwrap()
         .to_str()
         .unwrap();
-    assert!(cookie.starts_with("calrs_sso_try=1"), "loop guard cookie: {cookie}");
+    assert!(
+        cookie.starts_with("calrs_sso_try=1"),
+        "loop guard cookie: {cookie}"
+    );
 
     // The form stays reachable, a failed attempt doesn't loop, and signing out sticks.
     let local = app
