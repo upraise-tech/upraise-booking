@@ -16,7 +16,7 @@
 
 <div class="logo">{% if company_link %}<a href="{{ company_link }}" target="_blank" rel="noopener noreferrer">{% endif %}<img src="/logo" alt="" onerror="this.closest('.logo').style.display='none'">{% if company_link %}</a>{% endif %}</div>
 
-<a href="{{ base }}{{ embed_qs_q | default('') }}" class="back-link">&larr; {{ t("book-back-to-times") }}</a>
+<a href="{{ base }}{{ embed_qs_q | default('') }}{% if group_len is defined and group_len %}{% if embed_qs_q is defined and embed_qs_q %}&{% else %}?{% endif %}len={{ group_len }}&ls={{ group_len_sig }}{% endif %}" class="back-link">&larr; {{ t("book-back-to-times") }}</a>
 
 <div class="card">
   <h1>{{ event_type.title }}</h1>
@@ -45,6 +45,7 @@
     <input type="hidden" name="time" value="{{ time_start }}">
     {% if guest_tz is defined and guest_tz %}<input type="hidden" name="tz" value="{{ guest_tz }}">{% endif %}
     {% if invite_token is defined and invite_token %}<input type="hidden" name="invite_token" value="{{ invite_token }}">{% endif %}
+    {% if group_len is defined and group_len %}<input type="hidden" name="len" value="{{ group_len }}"><input type="hidden" name="ls" value="{{ group_len_sig }}">{% endif %}
 
     <div class="form-group">
       <label for="name">{{ t("book-name-label") }}</label>

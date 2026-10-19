@@ -3,7 +3,8 @@
 //! The directory lists every member so anyone can find a colleague's booking page and book them.
 //! A group meeting picks any members, whatever their teams, and shows the times when all of them
 //! are free. It is built on dynamic group links (`/u/a+b/slug`): the first person's meeting type
-//! sets the length, location and hours, everyone's calendars and working hours block time, and
+//! sets the location and hours (and the length, unless the member picks a custom one, which the
+//! link carries signed as `len`/`ls`), everyone's calendars and working hours block time, and
 //! booking a time goes through the normal dynamic-group booking (invites to everyone, write-back).
 
 use super::*;
@@ -14,6 +15,92 @@ const GROUP_MEETING_DAYS: i32 = 14;
 const GROUP_MEETING_MAX_DAYS_SHOWN: usize = 7;
 /// Longest wait for the members' calendars to sync before showing times from the cache.
 const GROUP_MEETING_SYNC_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(8);
+
+/// Shortest, longest and step of a custom group meeting length, in minutes.
+pub(super) const GROUP_LENGTH_MIN: i32 = 5;
+pub(super) const GROUP_LENGTH_MAX: i32 = 480;
+pub(super) const GROUP_LENGTH_STEP: i32 = 5;
+/// Lengths offered in the group meeting picker before "Other".
+const GROUP_LENGTH_PRESETS: [i32; 8] = [15, 20, 30, 45, 60, 90, 120, 180];
+/// Hex characters of the HMAC kept in a length link (64 bits).
+const GROUP_LENGTH_SIG_LEN: usize = 16;
+
+/// Whether `minutes` is a length a group meeting may have.
+pub(super) fn valid_group_length(minutes: i32) -> bool {
+    (GROUP_LENGTH_MIN..=GROUP_LENGTH_MAX).contains(&minutes) && minutes % GROUP_LENGTH_STEP == 0
+}
+
+fn group_length_message(usernames: &[String], slug: &str, minutes: i32) -> String {
+    let people = usernames
+        .iter()
+        .map(|u| u.trim().to_lowercase())
+        .collect::<Vec<_>>()
+        .join("+");
+    format!(
+        "calrs-group-length\n{}\n{}\n{}",
+        people,
+        slug.to_lowercase(),
+        minutes
+    )
+}
+
+/// The signature that lets a group link carry a custom length. Only members can make one (from
+/// the group meeting page), so a guest cannot change the length by editing the link.
+pub(super) fn group_length_sig(
+    key: &[u8; 32],
+    usernames: &[String],
+    slug: &str,
+    minutes: i32,
+) -> String {
+    let mut sig = meeting::sign_hmac_sha256(
+        key,
+        group_length_message(usernames, slug, minutes).as_bytes(),
+    );
+    sig.truncate(GROUP_LENGTH_SIG_LEN);
+    sig
+}
+
+/// The custom length a group link asks for, when its signature matches these people and this
+/// meeting type. Anything else (no length, a bad number, a wrong or edited signature) is `None`,
+/// and the meeting type's own length applies.
+pub(super) fn verified_group_length(
+    key: &[u8; 32],
+    usernames: &[String],
+    slug: &str,
+    len: Option<&str>,
+    sig: Option<&str>,
+) -> Option<i32> {
+    use hmac::{Hmac, Mac};
+    let minutes: i32 = len?.trim().parse().ok()?;
+    if !valid_group_length(minutes) {
+        return None;
+    }
+    let sig = hex::decode(sig?.trim()).ok()?;
+    if sig.len() * 2 != GROUP_LENGTH_SIG_LEN {
+        return None;
+    }
+    let mut mac = Hmac::<sha2::Sha256>::new_from_slice(key).ok()?;
+    mac.update(group_length_message(usernames, slug, minutes).as_bytes());
+    mac.verify_truncated_left(&sig).ok()?;
+    Some(minutes)
+}
+
+/// `&len=..&ls=..` for a group link with a custom length, or "" for the meeting type's own length.
+pub(super) fn group_length_params(
+    key: &[u8; 32],
+    usernames: &[String],
+    slug: &str,
+    custom: Option<i32>,
+) -> String {
+    match custom {
+        Some(m) => format!(
+            "&len={}&ls={}",
+            m,
+            group_length_sig(key, usernames, slug, m)
+        ),
+        None => String::new(),
+    }
+}
 
 type MemberRow = (
     String,         // id
@@ -170,6 +257,9 @@ pub(super) struct GroupMeetingQuery {
     /// "0" leaves the signed-in member out of the meeting.
     #[serde(default)]
     me: Option<String>,
+    /// A custom length in minutes; empty or absent keeps the meeting type's length.
+    #[serde(default)]
+    len: Option<String>,
 }
 
 /// The people in a group meeting, in order: the signed-in member first unless left out, then the
@@ -261,14 +351,33 @@ pub(super) async fn group_meeting_page(
     let mut meet_blocked = false;
     let ready = chosen.len() >= 2 && selected_et.is_some() && !me_group_off;
 
+    // A custom length replaces the meeting type's. It equals the type's own length -> no custom.
+    let asked_len = query
+        .len
+        .as_deref()
+        .map(str::trim)
+        .filter(|s| !s.is_empty());
+    let parsed_len = asked_len.and_then(|s| s.parse::<i32>().ok());
+    let len_invalid = asked_len.is_some() && !parsed_len.is_some_and(valid_group_length);
+    let custom_len = parsed_len
+        .filter(|m| valid_group_length(*m))
+        .filter(|m| selected_et.map(|e| e.3 != *m).unwrap_or(true));
+
     if ready {
         let (et_id, et_slug, _title, _duration, location_type) = selected_et.unwrap();
+        let usernames: Vec<String> = chosen.iter().map(|m| m.1.to_lowercase()).collect();
         let combined = chosen
             .iter()
             .map(|m| m.1.as_str())
             .collect::<Vec<_>>()
             .join("+");
-        booking_path = format!("/u/{}/{}", combined, et_slug);
+        let page_path = format!("/u/{}/{}", combined, et_slug);
+        let len_params = group_length_params(&state.secret_key, &usernames, et_slug, custom_len);
+        booking_path = if len_params.is_empty() {
+            page_path.clone()
+        } else {
+            format!("{}?{}", page_path, &len_params[1..])
+        };
         share_url = format!(
             "{}{}",
             crate::settings::base_url()
@@ -279,7 +388,7 @@ pub(super) async fn group_meeting_page(
         meet_blocked = location_type == meeting::LOCATION_TYPE_GOOGLE_MEET
             && !crate::google_meet::user_has_google_writeback(&state.pool, &chosen[0].0).await;
         if !meet_blocked {
-            let days = common_free_times(&state, et_id, &chosen, guest_tz).await;
+            let days = common_free_times(&state, et_id, &chosen, guest_tz, custom_len).await;
             more_days = days.len() > GROUP_MEETING_MAX_DAYS_SHOWN;
             days_ctx = days
                 .iter()
@@ -297,11 +406,12 @@ pub(super) async fn group_meeting_page(
                             context! {
                                 start => s.start,
                                 href => format!(
-                                    "{}/book?date={}&time={}&tz={}",
-                                    booking_path,
+                                    "{}/book?date={}&time={}&tz={}{}",
+                                    page_path,
                                     date,
                                     s.start,
-                                    urlencoding::encode(&guest_tz_name)
+                                    urlencoding::encode(&guest_tz_name),
+                                    len_params
                                 ),
                             }
                         })
@@ -366,19 +476,29 @@ pub(super) async fn group_meeting_page(
             booking_path => booking_path,
             guest_tz => guest_tz_name,
             horizon_days => GROUP_MEETING_DAYS,
+            et_duration => selected_et.map(|e| e.3).unwrap_or(0),
+            custom_len => custom_len,
+            len_value => custom_len.map(|m| m.to_string()).or_else(|| asked_len.map(str::to_string)).unwrap_or_default(),
+            len_invalid => len_invalid,
+            len_presets => GROUP_LENGTH_PRESETS.to_vec(),
+            len_min => GROUP_LENGTH_MIN,
+            len_max => GROUP_LENGTH_MAX,
+            len_step => GROUP_LENGTH_STEP,
         })
         .unwrap_or_else(|e| internal_error_body("template render", &e)),
     )
 }
 
-/// The times when everyone in `people` is free for the meeting type, over the next
-/// GROUP_MEETING_DAYS days, shown in `guest_tz`. Calendars are refreshed first, but never for
-/// longer than GROUP_MEETING_SYNC_TIMEOUT (the booking itself checks again when it is made).
+/// The times when everyone in `people` is free for the meeting type (for `length` minutes when
+/// set, else the type's own length), over the next GROUP_MEETING_DAYS days, shown in `guest_tz`.
+/// Calendars are refreshed first, but never for longer than GROUP_MEETING_SYNC_TIMEOUT (the
+/// booking itself checks again when it is made).
 async fn common_free_times(
     state: &AppState,
     et_id: &str,
     people: &[&MemberRow],
     guest_tz: Tz,
+    length: Option<i32>,
 ) -> Vec<SlotDay> {
     let mut sync_tasks = tokio::task::JoinSet::new();
     for m in people {
@@ -401,9 +521,10 @@ async fn common_free_times(
     .fetch_optional(&state.pool)
     .await
     .unwrap_or(None);
-    let Some((duration, buf_before, buf_after, min_notice)) = et else {
+    let Some((et_duration, buf_before, buf_after, min_notice)) = et else {
         return vec![];
     };
+    let duration = length.unwrap_or(et_duration);
     let host_tz = get_host_tz(&state.pool, et_id).await;
     let horizon = get_booking_horizon(&state.pool, et_id).await;
     let days_ahead = match horizon {

@@ -865,12 +865,12 @@
       </div>
       <div class="cal-nav" id="main-cal-nav">
         {% if prev_month is defined and prev_month %}
-          <a href="{{ base }}?month={{ prev_month }}{% if guest_tz is defined and guest_tz %}&tz={{ guest_tz }}{% endif %}{% if invite_token is defined and invite_token %}&invite={{ invite_token }}{% endif %}" class="cal-nav-link">&larr;</a>
+          <a href="{{ base }}?month={{ prev_month }}{% if guest_tz is defined and guest_tz %}&tz={{ guest_tz }}{% endif %}{% if invite_token is defined and invite_token %}&invite={{ invite_token }}{% endif %}{{ length_params | default('') }}" class="cal-nav-link">&larr;</a>
         {% else %}
           <span class="disabled">&larr;</span>
         {% endif %}
         {% if next_month is defined and next_month %}
-          <a href="{{ base }}?month={{ next_month }}{% if guest_tz is defined and guest_tz %}&tz={{ guest_tz }}{% endif %}{% if invite_token is defined and invite_token %}&invite={{ invite_token }}{% endif %}" class="cal-nav-link">&rarr;</a>
+          <a href="{{ base }}?month={{ next_month }}{% if guest_tz is defined and guest_tz %}&tz={{ guest_tz }}{% endif %}{% if invite_token is defined and invite_token %}&invite={{ invite_token }}{% endif %}{{ length_params | default('') }}" class="cal-nav-link">&rarr;</a>
         {% else %}
           <span class="disabled">&rarr;</span>
         {% endif %}
@@ -941,6 +941,7 @@
   var basePath = decHtml("{{ base }}");
   var guestTz = decHtml("{{ guest_tz }}");
   var inviteToken = decHtml("{{ invite_token | default(value='') }}");
+  var lengthParams = {{ length_params | default('') | tojson }};
   // Name and email from a "Book a call" link (Upraise Outreach adds ?name=&email=): carried to the booking form,
   // and kept for this tab so they survive month navigation.
   var prefillSuffix = (function () {
@@ -1153,6 +1154,7 @@
       }
       if (guestTz) href += '&tz=' + encodeURIComponent(guestTz);
       if (inviteToken) href += '&invite=' + encodeURIComponent(inviteToken);
+      href += lengthParams;
       href += prefillSuffix;
       href += embedSuffix;
       if (canBook) {
@@ -1172,6 +1174,7 @@
     if (isDynamicGroup) url += '&deferred=1';
     if (guestTz) url += '&tz=' + encodeURIComponent(guestTz);
     if (inviteToken) url += '&invite=' + encodeURIComponent(inviteToken);
+    url += lengthParams;
     url += embedSuffix;
 
     var layout = document.querySelector('.slots-layout');
@@ -1235,6 +1238,7 @@
       var prevUrl = basePath + '?month=' + data.prevMonth;
       if (guestTz) prevUrl += '&tz=' + encodeURIComponent(guestTz);
       if (inviteToken) prevUrl += '&invite=' + encodeURIComponent(inviteToken);
+      prevUrl += lengthParams;
       prevUrl += embedSuffix;
       var prev = document.createElement('a');
       prev.href = prevUrl;
@@ -1255,6 +1259,7 @@
       var nextUrl = basePath + '?month=' + data.nextMonth;
       if (guestTz) nextUrl += '&tz=' + encodeURIComponent(guestTz);
       if (inviteToken) nextUrl += '&invite=' + encodeURIComponent(inviteToken);
+      nextUrl += lengthParams;
       nextUrl += embedSuffix;
       var next = document.createElement('a');
       next.href = nextUrl;
@@ -1314,6 +1319,7 @@
     }
     if (guestTz) href += '&tz=' + encodeURIComponent(guestTz);
     if (inviteToken) href += '&invite=' + encodeURIComponent(inviteToken);
+    href += lengthParams;
     href += embedSuffix;
     return href;
   }
@@ -1486,6 +1492,7 @@
     var url = basePath + '?month=' + targetMonth;
     if (guestTz) url += '&tz=' + encodeURIComponent(guestTz);
     if (inviteToken) url += '&invite=' + encodeURIComponent(inviteToken);
+    url += lengthParams;
     url += embedSuffix;
 
     fetch(url).then(function(r) { return r.text(); }).then(function(html) {
@@ -1663,6 +1670,7 @@
     if (calData.monthYear) deferUrl += '&month=' + calData.monthYear;
     if (guestTz) deferUrl += '&tz=' + encodeURIComponent(guestTz);
     if (inviteToken) deferUrl += '&invite=' + encodeURIComponent(inviteToken);
+    deferUrl += lengthParams;
     deferUrl += embedSuffix;
 
     fetch(deferUrl).then(function(r) { return r.text(); }).then(function(html) {
