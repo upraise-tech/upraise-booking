@@ -2,6 +2,9 @@
 
 use super::*;
 
+/// Extra guest emails a guest may add to the invite on a new event type (0 = none).
+pub(super) const DEFAULT_ADDITIONAL_GUESTS: i32 = 10;
+
 /// Parse a dynamic group username string like "alice+bob+carol" into individual usernames.
 /// Returns the deduplicated list, or an error if fewer than 2 valid usernames.
 /// Parse a numeric form field, defaulting to `default` if empty or invalid.
@@ -615,7 +618,7 @@ pub(super) async fn new_event_type_form(
             form_meeting_pattern_override => "",
             form_avail_schedule => user_avail,
             form_reminder_minutes => 1440,
-            form_max_additional_guests => 0,
+            form_max_additional_guests => DEFAULT_ADDITIONAL_GUESTS,
             form_default_calendar_view => "month",
             form_first_slot_only => false,
             form_frequency_limits => "",
@@ -814,7 +817,7 @@ pub(super) async fn create_event_type(
     .bind(if team_id.is_some() { Some(&user.id) } else { None })
     .bind(reminder_minutes)
     .bind(&visibility)
-    .bind(parse_int_field(&form.max_additional_guests, 0))
+    .bind(parse_int_field(&form.max_additional_guests, DEFAULT_ADDITIONAL_GUESTS))
     .bind(&default_calendar_view)
     .bind(first_slot_only as i32)
     .bind(&timezone)
@@ -1827,6 +1830,7 @@ async fn render_event_type_form_error(
             form_avail_end => form.avail_end.as_deref().unwrap_or("17:00"),
             form_avail_windows => form.avail_windows.as_deref().unwrap_or(""),
             form_avail_schedule => form.avail_schedule.as_deref().unwrap_or(""),
+            form_max_additional_guests => parse_int_field(&form.max_additional_guests, DEFAULT_ADDITIONAL_GUESTS),
             form_default_calendar_view => form.default_calendar_view.as_deref().unwrap_or("month"),
             form_first_slot_only => form.first_slot_only.as_deref() == Some("on"),
             form_frequency_limits => form.frequency_limits.as_str(),
@@ -2144,6 +2148,7 @@ pub(super) async fn new_group_event_type_form(
             form_location_value => "",
             form_meeting_pattern_override => "",
             form_avail_schedule => user_avail,
+            form_max_additional_guests => DEFAULT_ADDITIONAL_GUESTS,
             form_default_calendar_view => "month",
             form_first_slot_only => false,
             form_frequency_limits => "",
@@ -2294,8 +2299,8 @@ pub(super) async fn create_group_event_type(
         .map(str::to_string);
 
     let _ = sqlx::query(
-        "INSERT INTO event_types (id, account_id, slug, title, description, duration_min, slot_interval_min, buffer_before, buffer_after, min_notice_min, requires_confirmation, location_type, location_value, team_id, created_by_user_id, default_calendar_view, first_slot_only, timezone, cancel_notice_min, reschedule_notice_min, meeting_pattern_override, sms_phone_mode, booking_horizon_days)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO event_types (id, account_id, slug, title, description, duration_min, slot_interval_min, buffer_before, buffer_after, min_notice_min, requires_confirmation, location_type, location_value, team_id, created_by_user_id, default_calendar_view, first_slot_only, timezone, cancel_notice_min, reschedule_notice_min, meeting_pattern_override, sms_phone_mode, booking_horizon_days, max_additional_guests)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     )
     .bind(&et_id)
     .bind(&account_id)
@@ -2320,6 +2325,7 @@ pub(super) async fn create_group_event_type(
     .bind(&meeting_pattern_override)
     .bind(&sms_phone_mode)
     .bind(booking_horizon_days)
+    .bind(parse_int_field(&form.max_additional_guests, DEFAULT_ADDITIONAL_GUESTS))
     .execute(&state.pool)
     .await;
     save_pending_settings(&state.pool, &et_id, &form, true).await;

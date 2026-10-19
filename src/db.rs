@@ -304,6 +304,10 @@ pub async fn migrate(pool: &SqlitePool) -> Result<()> {
             "072_meet_source",
             include_str!("../migrations/072_meet_source.sql"),
         ),
+        (
+            "073_additional_guests_default",
+            include_str!("../migrations/073_additional_guests_default.sql"),
+        ),
     ];
 
     let mut applied_count = 0u32;
@@ -913,7 +917,7 @@ mod tests {
             .fetch_one(&pool)
             .await
             .unwrap();
-        assert_eq!(count.0, 72, "All 72 migrations should be tracked");
+        assert_eq!(count.0, 73, "All 73 migrations should be tracked");
     }
 
     #[tokio::test]
@@ -1009,7 +1013,7 @@ mod tests {
             .fetch_one(&pool)
             .await
             .unwrap();
-        assert_eq!(count.0, 72, "Still 72 migrations after second run");
+        assert_eq!(count.0, 73, "Still 73 migrations after second run");
     }
 
     #[tokio::test]

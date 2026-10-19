@@ -87,6 +87,7 @@ Every user-facing string goes through Fluent (`i18n/`).
 | `event_types.rs` | Event type forms (personal and team), availability overrides, form parsing helpers |
 | `invites.rs` | Invite Links page, invite management, bulk invites, quick links |
 | `teams.rs` | Teams listing, creation, settings, avatars |
+| `people.rs` | Team directory (every member and their bookable meeting types) and group meetings (common free times for any members, over dynamic group links) |
 | `sources.rs` | Calendar sources: add, edit, test, sync, remove, write-back setup, Google connect |
 | `admin.rs` | Admin panel: users, auth and OIDC, theme, captcha, SMTP, SMS, meeting links, resources, impersonation |
 | `branding.rs` | Theme CSS, embed pages, static assets baked into the binary |
@@ -98,7 +99,7 @@ Every user-facing string goes through Fluent (`i18n/`).
 with `use super::*` and sees those fixtures and every item of `web`:
 `security`, `auth_pages`, `branding`, `format`, `availability`, `resources`,
 `hosts`, `event_types`, `invites`, `booking`, `public_pages`,
-`booking_actions`, `dashboard`, `sources`, `admin`, `emails`,
+`booking_actions`, `dashboard`, `people`, `sources`, `admin`, `emails`,
 `page_language`, `guards`, plus `booking_time`, `pending_hold`,
 `writeback_failures` and `organizer`.
 

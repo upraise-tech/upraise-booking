@@ -1481,3 +1481,46 @@ email-invite-message = { $host } zaprasza Cię do rezerwacji: { $event }
 email-invite-link = Kliknij poniższy link, aby wybrać termin:
 email-invite-action = Wybierz termin
 email-cancel-reason-calendar-deleted = Gospodarz usunął wydarzenie z kalendarza.
+
+## Katalog zespołu i spotkania grupowe
+
+nav-people = Katalog zespołu
+nav-group-meeting = Spotkanie grupowe
+people-page-title = Katalog zespołu
+people-heading = Katalog zespołu
+people-help = Wszyscy w Upraise Booking, niezależnie od zespołu. Otwórz czyjąś stronę rezerwacji, żeby umówić z tą osobą spotkanie, albo zaznacz kilka osób, żeby znaleźć termin pasujący wszystkim.
+people-search = Szukaj po imieniu lub stanowisku
+people-all-teams = Wszystkie zespoły
+people-you = Ty
+people-booking-page = Strona rezerwacji
+people-copy-invite = skopiuj link z zaproszeniem
+people-no-event-types = Nie ma jeszcze typów spotkań do zarezerwowania.
+people-empty = Nikt nie pasuje.
+people-find-time = Znajdź wspólny termin
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Zaznaczono: %1
+people-group-off = Ta osoba wyłączyła spotkania grupowe.
+people-pick-aria = Wybierz { $name } do spotkania grupowego
+gm-page-title = Spotkanie grupowe
+gm-heading = Spotkanie grupowe
+gm-help = Wybierz osoby z dowolnych zespołów, a potem typ spotkania. Zobaczysz terminy, w których wszyscy są wolni: zarezerwuj jeden od razu albo wyślij gościowi link, który pokazuje tylko te terminy.
+gm-people = Osoby
+gm-include-me = Uwzględnij mnie
+gm-include-me-hint = Na spotkanie tylko między współpracownikami nie uwzględniaj siebie i zarezerwuj je jako gość.
+gm-search = Szukaj osób
+gm-in-meeting = W tym spotkaniu
+gm-group-links-off = Spotkania grupowe są u Ciebie wyłączone, więc nie możesz w nich uczestniczyć. Włącz je ponownie w { $link } albo nie uwzględniaj siebie.
+gm-pick-two = Wybierz co najmniej dwie osoby.
+gm-no-types-me = Nie masz jeszcze publicznych typów spotkań. Najpierw utwórz jeden w { $link }.
+gm-no-types = Żadna z tych osób nie ma jeszcze publicznego typu spotkania, więc nie ma czego rezerwować. Ktoś z nich musi go najpierw utworzyć.
+gm-meeting-type = Typ spotkania
+gm-meeting-type-hint = Czas trwania, miejsce i godziny pochodzą z typu spotkania { $name }. Kalendarze i godziny pracy wszystkich blokują czas.
+gm-common-times = Kiedy wszyscy są wolni
+gm-times-tz = Godziny w strefie { $tz }. Kliknij termin, żeby go zarezerwować: wpisujesz dane gościa, a wszyscy dostają zaproszenie.
+gm-more-times = Zobacz wszystkie wspólne terminy na stronie rezerwacji
+gm-no-times = Brak wspólnego wolnego terminu w ciągu najbliższych { $days } dni. Spróbuj z mniejszą liczbą osób albo innym typem spotkania.
+gm-share = Link dla gościa
+gm-copy = Kopiuj link
+gm-copied = Skopiowano
+gm-open = Otwórz stronę rezerwacji
+gm-share-hint = Gość widzi tylko terminy, w których wszyscy są wolni. Każdy, kto ma link, może zarezerwować.

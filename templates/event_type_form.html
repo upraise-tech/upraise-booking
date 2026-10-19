@@ -447,7 +447,7 @@
 </details>
 
 <!-- Collapsible: Booking options -->
-<details class="card collapsible-section" style="margin-top: 1rem;"{% if editing and (form_requires_confirmation or (form_max_additional_guests is defined and form_max_additional_guests and form_max_additional_guests != 0) or (form_default_calendar_view is defined and form_default_calendar_view and form_default_calendar_view != "month") or (selected_resource_ids is defined and selected_resource_ids)) %} open{% endif %}>
+<details class="card collapsible-section" style="margin-top: 1rem;"{% if editing and (form_requires_confirmation or (form_max_additional_guests is defined and form_max_additional_guests != 10) or (form_default_calendar_view is defined and form_default_calendar_view and form_default_calendar_view != "month") or (selected_resource_ids is defined and selected_resource_ids)) %} open{% endif %}>
   <summary class="collapsible-header">
     <h2>{{ t("etf-section-options") }}</h2>
     <span class="collapsible-hint" id="options-hint"></span>

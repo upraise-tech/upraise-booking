@@ -1457,3 +1457,46 @@ email-invite-message = { $host } convidou você para agendar: { $event }
 email-invite-link = Clique no link abaixo para escolher um horário:
 email-invite-action = Escolher um horário
 email-cancel-reason-calendar-deleted = O organizador excluiu o evento da agenda.
+
+## Diretório da equipe e reuniões em grupo
+
+nav-people = Diretório da equipe
+nav-group-meeting = Reunião em grupo
+people-page-title = Diretório da equipe
+people-heading = Diretório da equipe
+people-help = Todas as pessoas no Upraise Booking, de qualquer equipe. Abra a página de agendamento de alguém para marcar uma reunião com essa pessoa, ou marque várias pessoas para encontrar um horário que sirva para todos.
+people-search = Buscar por nome ou cargo
+people-all-teams = Todas as equipes
+people-you = Você
+people-booking-page = Página de agendamento
+people-copy-invite = copiar link de convite
+people-no-event-types = Ainda não há tipos de reunião para agendar.
+people-empty = Ninguém corresponde.
+people-find-time = Encontrar um horário em comum
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Selecionadas: %1
+people-group-off = Esta pessoa desativou as reuniões em grupo.
+people-pick-aria = Escolher { $name } para uma reunião em grupo
+gm-page-title = Reunião em grupo
+gm-heading = Reunião em grupo
+gm-help = Escolha as pessoas, de qualquer equipe, e depois um tipo de reunião. Você vai ver os horários em que todos estão livres: agende um agora ou envie ao convidado um link que só oferece esses horários.
+gm-people = Pessoas
+gm-include-me = Me incluir
+gm-include-me-hint = Para uma reunião só entre colegas, não se inclua e agende como convidado.
+gm-search = Buscar pessoas
+gm-in-meeting = Nesta reunião
+gm-group-links-off = Você desativou as reuniões em grupo, então não pode participar de uma. Ative de novo em { $link } ou não se inclua.
+gm-pick-two = Escolha pelo menos duas pessoas.
+gm-no-types-me = Você ainda não tem tipos de reunião públicos. Crie um primeiro em { $link }.
+gm-no-types = Nenhuma dessas pessoas tem ainda um tipo de reunião público, então não há nada para agendar. Uma delas precisa criar um primeiro.
+gm-meeting-type = Tipo de reunião
+gm-meeting-type-hint = A duração, o local e os horários vêm do tipo de reunião de { $name }. As agendas e os horários de trabalho de todos bloqueiam tempo.
+gm-common-times = Quando todos estão livres
+gm-times-tz = Horários em { $tz }. Clique em um para agendar: você preenche os dados do convidado e todos recebem o convite.
+gm-more-times = Ver todos os horários em comum na página de agendamento
+gm-no-times = Nenhum horário livre em comum nos próximos { $days } dias. Tente com menos pessoas ou outro tipo de reunião.
+gm-share = Link para o convidado
+gm-copy = Copiar link
+gm-copied = Copiado
+gm-open = Abrir página de agendamento
+gm-share-hint = O convidado só vê os horários em que todos estão livres. Qualquer pessoa com o link pode agendar.

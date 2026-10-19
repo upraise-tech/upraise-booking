@@ -1457,3 +1457,46 @@ email-invite-message = { $host } kutsus sind broneerima: { $event }
 email-invite-link = Klõpsa alloleval lingil, et aeg valida:
 email-invite-action = Vali aeg
 email-cancel-reason-calendar-deleted = Korraldaja kustutas kalendrisündmuse.
+
+## Meeskonna kataloog ja grupikohtumised
+
+nav-people = Meeskonna kataloog
+nav-group-meeting = Grupikohtumine
+people-page-title = Meeskonna kataloog
+people-heading = Meeskonna kataloog
+people-help = Kõik Upraise Bookingu kasutajad, olenemata meeskonnast. Ava kellegi broneerimisleht, et temaga kohtumine broneerida, või märgi mitu inimest, et leida kõigile sobiv aeg.
+people-search = Otsi nime või ametikoha järgi
+people-all-teams = Kõik meeskonnad
+people-you = Sina
+people-booking-page = Broneerimisleht
+people-copy-invite = kopeeri kutse link
+people-no-event-types = Broneeritavaid kohtumisetüüpe veel pole.
+people-empty = Kedagi ei leitud.
+people-find-time = Leia ühine aeg
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Valitud: %1
+people-group-off = See inimene on grupikohtumised välja lülitanud.
+people-pick-aria = Vali { $name } grupikohtumisele
+gm-page-title = Grupikohtumine
+gm-heading = Grupikohtumine
+gm-help = Vali inimesed ükskõik millisest meeskonnast ja seejärel kohtumisetüüp. Näed aegu, mil kõik on vabad: broneeri üks kohe või saada külalisele link, mis pakub ainult neid aegu.
+gm-people = Inimesed
+gm-include-me = Kaasa mind
+gm-include-me-hint = Ainult kolleegide vahelise kohtumise jaoks jäta end välja ja broneeri see külalisena.
+gm-search = Otsi inimesi
+gm-in-meeting = Selles kohtumises
+gm-group-links-off = Oled grupikohtumised välja lülitanud, seega ei saa sa neis osaleda. Lülita need uuesti sisse lehel { $link } või jäta end välja.
+gm-pick-two = Vali vähemalt kaks inimest.
+gm-no-types-me = Sul pole veel avalikke kohtumisetüüpe. Loo kõigepealt üks lehel { $link }.
+gm-no-types = Kellelgi neist inimestest pole veel avalikku kohtumisetüüpi, seega pole midagi broneerida. Üks neist peab selle kõigepealt looma.
+gm-meeting-type = Kohtumisetüüp
+gm-meeting-type-hint = Kestus, asukoht ja ajad tulevad kasutaja { $name } kohtumisetüübist. Kõigi kalendrid ja tööajad blokeerivad aega.
+gm-common-times = Millal kõik on vabad
+gm-times-tz = Ajad ajavööndis { $tz }. Klõpsa ühel, et see broneerida: sisestad külalise andmed ja kõik saavad kutse.
+gm-more-times = Vaata kõiki ühiseid aegu broneerimislehel
+gm-no-times = Järgmise { $days } päeva jooksul pole ühist vaba aega. Proovi vähemate inimestega või teise kohtumisetüübiga.
+gm-share = Link külalisele
+gm-copy = Kopeeri link
+gm-copied = Kopeeritud
+gm-open = Ava broneerimisleht
+gm-share-hint = Külaline näeb ainult aegu, mil kõik on vabad. Igaüks, kellel on link, saab broneerida.

@@ -14,6 +14,7 @@ mod invites;
 pub mod meeting;
 mod notify;
 mod pending;
+mod people;
 mod public_pages;
 mod sources;
 mod teams;
@@ -61,6 +62,7 @@ pub use notify::run_reminder_loop;
 pub(crate) use notify::spawn_emails;
 use notify::*;
 use pending::*;
+use people::*;
 use public_pages::*;
 use sources::*;
 use teams::*;
@@ -585,6 +587,8 @@ pub async fn create_router(pool: SqlitePool, data_dir: PathBuf, secret_key: [u8;
         )
         .route("/dashboard/bookings", get(dashboard_bookings))
         .route("/dashboard/teams", get(dashboard_teams))
+        .route("/dashboard/people", get(dashboard_people))
+        .route("/dashboard/group-meeting", get(group_meeting_page))
         .route(
             "/dashboard/teams/new",
             get(show_team_form).post(create_team),

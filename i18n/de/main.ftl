@@ -1457,3 +1457,46 @@ email-invite-message = { $host } hat dich eingeladen, einen Termin zu buchen: { 
 email-invite-link = Klicke auf den Link unten, um einen Termin zu wählen:
 email-invite-action = Termin wählen
 email-cancel-reason-calendar-deleted = Der Kalendertermin wurde vom Gastgeber gelöscht.
+
+## Teamverzeichnis und Gruppentermine
+
+nav-people = Teamverzeichnis
+nav-group-meeting = Gruppentermin
+people-page-title = Teamverzeichnis
+people-heading = Teamverzeichnis
+people-help = Alle Personen in Upraise Booking, egal in welchem Team. Öffne die Buchungsseite einer Person, um einen Termin mit ihr zu buchen, oder hake mehrere Personen an, um eine Zeit zu finden, die allen passt.
+people-search = Nach Name oder Position suchen
+people-all-teams = Alle Teams
+people-you = Du
+people-booking-page = Buchungsseite
+people-copy-invite = Einladungslink kopieren
+people-no-event-types = Noch keine buchbaren Terminarten.
+people-empty = Niemand passt.
+people-find-time = Gemeinsame Zeit finden
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Ausgewählt: %1
+people-group-off = Diese Person hat Gruppentermine ausgeschaltet.
+people-pick-aria = { $name } für einen Gruppentermin auswählen
+gm-page-title = Gruppentermin
+gm-heading = Gruppentermin
+gm-help = Wähle die Personen aus beliebigen Teams und dann eine Terminart. Du siehst die Zeiten, zu denen alle frei sind: buche gleich eine oder schicke dem Gast einen Link, der nur diese Zeiten anbietet.
+gm-people = Personen
+gm-include-me = Mich einbeziehen
+gm-include-me-hint = Für einen Termin nur unter Kolleginnen und Kollegen lass dich selbst weg und buche ihn als Gast.
+gm-search = Personen suchen
+gm-in-meeting = In diesem Termin
+gm-group-links-off = Du hast Gruppentermine ausgeschaltet und kannst deshalb an keinem teilnehmen. Schalte sie unter { $link } wieder ein oder lass dich weg.
+gm-pick-two = Wähle mindestens zwei Personen.
+gm-no-types-me = Du hast noch keine öffentliche Terminart. Lege zuerst unter { $link } eine an.
+gm-no-types = Keine dieser Personen hat bisher eine öffentliche Terminart, deshalb gibt es nichts zu buchen. Eine von ihnen muss zuerst eine anlegen.
+gm-meeting-type = Terminart
+gm-meeting-type-hint = Dauer, Ort und Zeiten kommen aus der Terminart von { $name }. Die Kalender und Arbeitszeiten aller blockieren Zeit.
+gm-common-times = Wann alle frei sind
+gm-times-tz = Zeiten in { $tz }. Klicke auf eine, um sie zu buchen: du trägst die Daten des Gasts ein, und alle bekommen die Einladung.
+gm-more-times = Alle gemeinsamen Zeiten auf der Buchungsseite ansehen
+gm-no-times = In den nächsten { $days } Tagen gibt es keine gemeinsame freie Zeit. Versuche es mit weniger Personen oder einer anderen Terminart.
+gm-share = Link für den Gast
+gm-copy = Link kopieren
+gm-copied = Kopiert
+gm-open = Buchungsseite öffnen
+gm-share-hint = Der Gast sieht nur Zeiten, zu denen alle frei sind. Jeder mit dem Link kann buchen.

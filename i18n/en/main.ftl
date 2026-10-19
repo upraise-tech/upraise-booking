@@ -1459,3 +1459,46 @@ email-invite-message = { $host } has invited you to book: { $event }
 email-invite-link = Click the link below to choose a time:
 email-invite-action = Choose a time
 email-cancel-reason-calendar-deleted = The calendar event was deleted by the host.
+
+## Team directory and group meetings
+
+nav-people = Team directory
+nav-group-meeting = Group meeting
+people-page-title = Team directory
+people-heading = Team directory
+people-help = Everyone on Upraise Booking, whatever their team. Open someone's booking page to book a meeting with them, or tick a few people to find a time that suits all of you.
+people-search = Search by name or title
+people-all-teams = All teams
+people-you = You
+people-booking-page = Booking page
+people-copy-invite = copy invite link
+people-no-event-types = No meeting types to book yet.
+people-empty = No one matches.
+people-find-time = Find a time together
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Selected: %1
+people-group-off = This person has turned off group meetings.
+people-pick-aria = Pick { $name } for a group meeting
+gm-page-title = Group meeting
+gm-heading = Group meeting
+gm-help = Pick the people from any team, then a meeting type. You'll see the times when everyone is free: book one now, or send the guest a link that only offers those times.
+gm-people = People
+gm-include-me = Include me
+gm-include-me-hint = For a meeting between teammates only, leave yourself out and book it as the guest.
+gm-search = Search people
+gm-in-meeting = In this meeting
+gm-group-links-off = You've turned off group meetings, so you can't be in one. Turn them back on in { $link }, or leave yourself out.
+gm-pick-two = Pick at least two people.
+gm-no-types-me = You have no public meeting types yet. Create one in { $link } first.
+gm-no-types = None of these people has a public meeting type yet, so there is nothing to book. One of them needs to create one first.
+gm-meeting-type = Meeting type
+gm-meeting-type-hint = The length, the location and the hours come from { $name }'s meeting type. Everyone's calendars and working hours block time.
+gm-common-times = When everyone is free
+gm-times-tz = Times in { $tz }. Click one to book it: you fill in the guest's details, and everyone gets the invite.
+gm-more-times = See every common time on the booking page
+gm-no-times = No common free time in the next { $days } days. Try fewer people or another meeting type.
+gm-share = Link for the guest
+gm-copy = Copy link
+gm-copied = Copied
+gm-open = Open booking page
+gm-share-hint = The guest only sees times when everyone is free. Anyone with the link can book.

@@ -35,7 +35,7 @@ Go to **Dashboard > Event types > + New** and fill in:
 - **Buffer before/after** — padding between meetings (prevents back-to-back bookings)
 - **Minimum notice** — how far in advance guests must book (in minutes)
 - **Requires confirmation** — if checked, bookings start as "pending" and you approve from the dashboard or the email. Two more settings appear: **Pending requests block the time slot** (on by default) and **Request expiry** (how long a request may wait before it is declined automatically). See [Confirmation mode](booking-flow.md#confirmation-mode).
-- **Additional guests** — allow guests to invite additional attendees (0, 1, 3, 5, or 10 max)
+- **Additional guests** — allow guests to invite additional attendees (0, 1, 3, 5, or 10 max). New event types allow up to 10; pick "None" to turn it off
 - **Location** — video link, phone number, in-person address, or custom text
 - **Availability schedule** — which days and hours you're available
 

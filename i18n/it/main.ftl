@@ -1457,3 +1457,46 @@ email-invite-message = { $host } ti ha invitato a prenotare: { $event }
 email-invite-link = Clicca sul link qui sotto per scegliere un orario:
 email-invite-action = Scegli un orario
 email-cancel-reason-calendar-deleted = L'evento è stato eliminato dal calendario dell'organizzatore.
+
+## Rubrica del team e riunioni di gruppo
+
+nav-people = Rubrica del team
+nav-group-meeting = Riunione di gruppo
+people-page-title = Rubrica del team
+people-heading = Rubrica del team
+people-help = Tutte le persone su Upraise Booking, di qualsiasi team. Apri la pagina di prenotazione di qualcuno per prenotare un incontro con questa persona, oppure seleziona più persone per trovare un orario che vada bene a tutti.
+people-search = Cerca per nome o ruolo
+people-all-teams = Tutti i team
+people-you = Tu
+people-booking-page = Pagina di prenotazione
+people-copy-invite = copia link di invito
+people-no-event-types = Ancora nessun tipo di incontro da prenotare.
+people-empty = Nessuno corrisponde.
+people-find-time = Trova un orario comune
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Selezionate: %1
+people-group-off = Questa persona ha disattivato le riunioni di gruppo.
+people-pick-aria = Scegli { $name } per una riunione di gruppo
+gm-page-title = Riunione di gruppo
+gm-heading = Riunione di gruppo
+gm-help = Scegli le persone, da qualsiasi team, poi un tipo di incontro. Vedrai gli orari in cui tutti sono liberi: prenotane uno subito o invia all'ospite un link che offre solo quegli orari.
+gm-people = Persone
+gm-include-me = Includimi
+gm-include-me-hint = Per una riunione solo tra colleghi, non includerti e prenota come ospite.
+gm-search = Cerca persone
+gm-in-meeting = In questa riunione
+gm-group-links-off = Hai disattivato le riunioni di gruppo, quindi non puoi partecipare a una. Riattivale in { $link } oppure non includerti.
+gm-pick-two = Scegli almeno due persone.
+gm-no-types-me = Non hai ancora tipi di incontro pubblici. Creane prima uno in { $link }.
+gm-no-types = Nessuna di queste persone ha ancora un tipo di incontro pubblico, quindi non c'è niente da prenotare. Una di loro deve prima crearne uno.
+gm-meeting-type = Tipo di incontro
+gm-meeting-type-hint = Durata, luogo e orari vengono dal tipo di incontro di { $name }. I calendari e gli orari di lavoro di tutti bloccano il tempo.
+gm-common-times = Quando tutti sono liberi
+gm-times-tz = Orari in { $tz }. Fai clic su uno per prenotarlo: inserisci i dati dell'ospite e tutti ricevono l'invito.
+gm-more-times = Vedi tutti gli orari comuni nella pagina di prenotazione
+gm-no-times = Nessun orario libero in comune nei prossimi { $days } giorni. Prova con meno persone o con un altro tipo di incontro.
+gm-share = Link per l'ospite
+gm-copy = Copia link
+gm-copied = Copiato
+gm-open = Apri la pagina di prenotazione
+gm-share-hint = L'ospite vede solo gli orari in cui tutti sono liberi. Chiunque abbia il link può prenotare.

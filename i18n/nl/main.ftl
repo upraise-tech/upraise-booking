@@ -1458,3 +1458,46 @@ email-invite-message = { $host } heeft je uitgenodigd om te boeken: { $event }
 email-invite-link = Klik op de link hieronder om een tijdstip te kiezen:
 email-invite-action = Kies een tijdstip
 email-cancel-reason-calendar-deleted = De organisator heeft het agenda-evenement verwijderd.
+
+## Teamoverzicht en groepsafspraken
+
+nav-people = Teamoverzicht
+nav-group-meeting = Groepsafspraak
+people-page-title = Teamoverzicht
+people-heading = Teamoverzicht
+people-help = Iedereen in Upraise Booking, uit elk team. Open iemands boekingspagina om een afspraak met die persoon te boeken, of vink een paar mensen aan om een tijd te vinden die iedereen past.
+people-search = Zoeken op naam of functie
+people-all-teams = Alle teams
+people-you = Jij
+people-booking-page = Boekingspagina
+people-copy-invite = uitnodigingslink kopiëren
+people-no-event-types = Nog geen afspraaktypes om te boeken.
+people-empty = Niemand gevonden.
+people-find-time = Een gezamenlijke tijd vinden
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Geselecteerd: %1
+people-group-off = Deze persoon heeft groepsafspraken uitgezet.
+people-pick-aria = { $name } kiezen voor een groepsafspraak
+gm-page-title = Groepsafspraak
+gm-heading = Groepsafspraak
+gm-help = Kies de mensen, uit elk team, en daarna een afspraaktype. Je ziet de tijden waarop iedereen vrij is: boek er meteen een, of stuur de gast een link die alleen die tijden aanbiedt.
+gm-people = Mensen
+gm-include-me = Mij meenemen
+gm-include-me-hint = Voor een afspraak alleen tussen collega's laat je jezelf weg en boek je hem als gast.
+gm-search = Mensen zoeken
+gm-in-meeting = In deze afspraak
+gm-group-links-off = Je hebt groepsafspraken uitgezet, dus je kunt er niet aan meedoen. Zet ze weer aan bij { $link }, of laat jezelf weg.
+gm-pick-two = Kies minstens twee mensen.
+gm-no-types-me = Je hebt nog geen openbare afspraaktypes. Maak er eerst een aan bij { $link }.
+gm-no-types = Geen van deze mensen heeft al een openbaar afspraaktype, dus er valt niets te boeken. Een van hen moet er eerst een aanmaken.
+gm-meeting-type = Afspraaktype
+gm-meeting-type-hint = De duur, de locatie en de tijden komen uit het afspraaktype van { $name }. Ieders agenda en werktijden blokkeren tijd.
+gm-common-times = Wanneer iedereen vrij is
+gm-times-tz = Tijden in { $tz }. Klik op een tijd om hem te boeken: je vult de gegevens van de gast in en iedereen krijgt de uitnodiging.
+gm-more-times = Alle gezamenlijke tijden op de boekingspagina bekijken
+gm-no-times = Geen gezamenlijke vrije tijd in de komende { $days } dagen. Probeer het met minder mensen of een ander afspraaktype.
+gm-share = Link voor de gast
+gm-copy = Link kopiëren
+gm-copied = Gekopieerd
+gm-open = Boekingspagina openen
+gm-share-hint = De gast ziet alleen tijden waarop iedereen vrij is. Iedereen met de link kan boeken.
