@@ -1,0 +1,157 @@
+{% extends "dashboard_base.html" %}
+{% block title %}{{ t("gm-page-title") }} — Upraise Booking{% endblock %}
+{% block dashboard_content %}
+<style>
+  .gm-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1rem; align-items: start; }
+  @media (max-width: 860px) { .gm-grid { grid-template-columns: minmax(0, 1fr); } }
+  .gm-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.6rem; }
+  .gm-search { width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font: inherit; font-size: 0.875rem; margin-bottom: 0.5rem; }
+  .gm-list { max-height: 460px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  .gm-person { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .gm-person:last-child { border-bottom: 0; }
+  .gm-person input { width: 16px; height: 16px; accent-color: var(--accent); }
+  .gm-person.off { opacity: 0.5; cursor: not-allowed; }
+  .gm-person .who { min-width: 0; }
+  .gm-person .who b { font-weight: 600; font-size: 0.9rem; }
+  .gm-person .who span { display: block; color: var(--text-muted); font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gm-me { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; margin-bottom: 0.25rem; cursor: pointer; }
+  .gm-me input { width: 16px; height: 16px; accent-color: var(--accent); }
+  .gm-hint { color: var(--text-muted); font-size: 0.8rem; margin: 0.25rem 0 0.75rem; }
+  .gm-faces { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+  .gm-face { display: inline-flex; align-items: center; gap: 0.35rem; border: 1px solid var(--border); border-radius: 999px; padding: 0.15rem 0.6rem 0.15rem 0.2rem; font-size: 0.8rem; }
+  .gm-face .avatar-circle { width: 22px; height: 22px; font-size: 0.6rem; }
+  .gm-select { width: 100%; padding: 0.55rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font: inherit; font-size: 0.9rem; }
+  .gm-day { padding: 0.65rem 0; border-bottom: 1px solid var(--border); }
+  .gm-day:last-child { border-bottom: 0; }
+  .gm-day-label { font-weight: 600; font-size: 0.875rem; margin-bottom: 0.4rem; }
+  .gm-slots { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .gm-slots a { font-size: 0.8rem; text-decoration: none; padding: 0.3rem 0.6rem; font-variant-numeric: tabular-nums; }
+  .gm-share { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .gm-share input { flex: 1 1 260px; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2, var(--surface)); color: var(--text); font: inherit; font-size: 0.8rem; }
+  .gm-btn { background: var(--accent); color: #fff; border: 0; border-radius: var(--radius); padding: 0.5rem 0.85rem; font: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-decoration: none; }
+  .gm-note { padding: 0.75rem 0.9rem; border-radius: var(--radius); background: var(--surface-2, var(--surface)); border: 1px solid var(--border); font-size: 0.875rem; }
+</style>
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+    <h1 style="margin-bottom: 0;">{{ t("gm-heading") }}</h1>
+    <a href="/dashboard/people" class="slot-btn" style="text-decoration: none; font-size: 0.85rem;">{{ t("nav-people") }}</a>
+  </div>
+  <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">{{ t("gm-help") }}</p>
+
+  <div class="gm-grid">
+    <div>
+      <p class="gm-label">{{ t("gm-people") }}</p>
+      <label class="gm-me"><input type="checkbox" id="gm-include-me" {% if include_me %}checked{% endif %}> {{ t("gm-include-me") }}</label>
+      <p class="gm-hint">{{ t("gm-include-me-hint") }}</p>
+      <input type="search" class="gm-search" id="gm-search" placeholder="{{ t('gm-search') }}" aria-label="{{ t('gm-search') }}">
+      <div class="gm-list" id="gm-list">
+        {% for c in candidates %}
+        <label class="gm-person{% if not c.can_group %} off{% endif %}" data-search="{{ (c.name ~ ' ' ~ c.title ~ ' ' ~ c.username) | lower }}" {% if not c.can_group %}title="{{ t('people-group-off') }}"{% endif %}>
+          <input type="checkbox" class="gm-pick" value="{{ c.username }}" {% if c.picked %}checked{% endif %} {% if not c.can_group %}disabled{% endif %}>
+          <span class="avatar-circle" style="width: 28px; height: 28px; font-size: 0.65rem; flex-shrink: 0;">{% if c.has_avatar %}<img src="/avatar/{{ c.id }}" alt="">{% else %}{{ c.initials }}{% endif %}</span>
+          <span class="who"><b>{{ c.name }}</b>{% if c.title %}<span>{{ c.title }}</span>{% endif %}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div>
+      {% if people %}
+      <p class="gm-label">{{ t("gm-in-meeting") }}</p>
+      <div class="gm-faces">
+        {% for p in people %}
+        <span class="gm-face"><span class="avatar-circle">{% if p.has_avatar %}<img src="/avatar/{{ p.id }}" alt="">{% else %}{{ p.initials }}{% endif %}</span>{{ p.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if me_group_off %}
+        <div class="gm-note">{{ t("gm-group-links-off", link='<a href="/dashboard/settings" style="color: var(--accent);">' ~ (t("nav-settings") | escape) ~ '</a>') | safe }}</div>
+      {% elif people_count < 2 %}
+        <div class="gm-note">{{ t("gm-pick-two") }}</div>
+      {% elif not event_types %}
+        <div class="gm-note">{% if owner_is_me %}{{ t("gm-no-types-me", link='<a href="/dashboard/event-types/new" style="color: var(--accent);">' ~ (t("nav-event-types") | escape) ~ '</a>') | safe }}{% else %}{{ t("gm-no-types") }}{% endif %}</div>
+      {% else %}
+        <p class="gm-label">{{ t("gm-meeting-type") }}</p>
+        <select class="gm-select" id="gm-et" aria-label="{{ t('gm-meeting-type') }}">
+          {% for et in event_types %}
+          <option value="{{ et.id }}" {% if et.selected %}selected{% endif %}>{{ et.title }} · {{ t("invite-links-duration", minutes=et.duration_min) }}</option>
+          {% endfor %}
+        </select>
+        <p class="gm-hint">{{ t("gm-meeting-type-hint", name=owner_name) }}</p>
+
+        {% if meet_blocked %}
+          <div class="gm-note">{{ t("google-meet-dynamic-group-unavailable") }}</div>
+        {% else %}
+          <p class="gm-label" style="margin-top: 1.1rem;">{{ t("gm-common-times") }}</p>
+          {% if days %}
+            <p class="gm-hint">{{ t("gm-times-tz", tz=guest_tz) }}</p>
+            {% for d in days %}
+            <div class="gm-day">
+              <div class="gm-day-label">{{ d.label }}</div>
+              <div class="gm-slots">
+                {% for s in d.slots %}<a href="{{ s.href }}" target="_blank" rel="noopener" class="slot-btn">{{ s.start }}</a>{% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+            {% if more_days %}<p class="gm-hint" style="margin-top: 0.6rem;"><a href="{{ booking_path }}" target="_blank" rel="noopener" style="color: var(--accent);">{{ t("gm-more-times") }}</a></p>{% endif %}
+          {% else %}
+            <div class="gm-note">{{ t("gm-no-times", days=horizon_days) }}</div>
+          {% endif %}
+
+          <p class="gm-label" style="margin-top: 1.25rem;">{{ t("gm-share") }}</p>
+          <div class="gm-share">
+            <input type="text" id="gm-link" value="{{ share_url }}" readonly aria-label="{{ t('gm-share') }}">
+            <button type="button" class="gm-btn" id="gm-copy">{{ t("gm-copy") }}</button>
+            <a href="{{ booking_path }}" target="_blank" rel="noopener" class="slot-btn" style="text-decoration: none; font-size: 0.85rem;">{{ t("gm-open") }}</a>
+          </div>
+          <p class="gm-hint">{{ t("gm-share-hint") }}</p>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  function go() {
+    var picks = Array.prototype.slice.call(document.querySelectorAll('.gm-pick:checked')).map(function(b) { return b.value; });
+    var params = new URLSearchParams();
+    if (picks.length) params.set('with', picks.join(','));
+    if (!document.getElementById('gm-include-me').checked) params.set('me', '0');
+    var et = document.getElementById('gm-et');
+    if (et) params.set('et', et.value);
+    location.href = '/dashboard/group-meeting' + (params.toString() ? '?' + params.toString() : '');
+  }
+  document.querySelectorAll('.gm-pick').forEach(function(b) { b.addEventListener('change', go); });
+  document.getElementById('gm-include-me').addEventListener('change', function() {
+    var et = document.getElementById('gm-et');
+    if (et) et.remove();      // the first person changes, and with them the meeting types
+    go();
+  });
+  var et = document.getElementById('gm-et');
+  if (et) et.addEventListener('change', go);
+
+  var search = document.getElementById('gm-search');
+  search.addEventListener('input', function() {
+    var q = search.value.trim().toLowerCase();
+    document.querySelectorAll('.gm-person').forEach(function(r) {
+      r.style.display = !q || r.dataset.search.indexOf(q) >= 0 ? '' : 'none';
+    });
+  });
+
+  var linkInput = document.getElementById('gm-link');
+  if (linkInput && linkInput.value.charAt(0) === '/') linkInput.value = location.origin + linkInput.value;
+  var copyBtn = document.getElementById('gm-copy');
+  if (copyBtn) copyBtn.addEventListener('click', function() {
+    var input = document.getElementById('gm-link');
+    var done = function() {
+      copyBtn.textContent = {{ t('gm-copied') | tojson }};
+      setTimeout(function() { copyBtn.textContent = {{ t('gm-copy') | tojson }}; }, 2000);
+    };
+    if (navigator.clipboard) navigator.clipboard.writeText(input.value).then(done, function() { input.select(); });
+    else { input.select(); try { document.execCommand('copy'); done(); } catch (e) {} }
+  });
+})();
+</script>
+{% endblock %}

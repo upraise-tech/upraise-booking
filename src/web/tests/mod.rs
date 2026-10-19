@@ -22,6 +22,7 @@ mod invites;
 mod organizer;
 mod page_language;
 mod pending_hold;
+mod people;
 mod public_pages;
 mod resources;
 mod security;

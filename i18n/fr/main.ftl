@@ -1457,3 +1457,46 @@ email-invite-message = { $host } vous invite à réserver : { $event }
 email-invite-link = Cliquez sur le lien ci-dessous pour choisir un créneau :
 email-invite-action = Choisir un créneau
 email-cancel-reason-calendar-deleted = L'événement a été supprimé de l'agenda de l'hôte.
+
+## Annuaire de l'équipe et réunions de groupe
+
+nav-people = Annuaire de l'équipe
+nav-group-meeting = Réunion de groupe
+people-page-title = Annuaire de l'équipe
+people-heading = Annuaire de l'équipe
+people-help = Toutes les personnes présentes sur Upraise Booking, quelle que soit leur équipe. Ouvrez la page de réservation de quelqu'un pour réserver un rendez-vous avec cette personne, ou cochez plusieurs personnes pour trouver un créneau qui convient à tous.
+people-search = Rechercher par nom ou par poste
+people-all-teams = Toutes les équipes
+people-you = Vous
+people-booking-page = Page de réservation
+people-copy-invite = copier le lien d'invitation
+people-no-event-types = Aucun type de rendez-vous à réserver pour l'instant.
+people-empty = Personne ne correspond.
+people-find-time = Trouver un créneau commun
+# %1 is the number of people ticked, filled in on the page.
+people-selected = Sélection : %1
+people-group-off = Cette personne a désactivé les réunions de groupe.
+people-pick-aria = Choisir { $name } pour une réunion de groupe
+gm-page-title = Réunion de groupe
+gm-heading = Réunion de groupe
+gm-help = Choisissez les personnes, de n'importe quelle équipe, puis un type de rendez-vous. Vous verrez les créneaux où tout le monde est libre : réservez-en un maintenant, ou envoyez à l'invité un lien qui ne propose que ces créneaux.
+gm-people = Personnes
+gm-include-me = M'inclure
+gm-include-me-hint = Pour une réunion entre collègues uniquement, ne vous incluez pas et réservez en tant qu'invité.
+gm-search = Rechercher des personnes
+gm-in-meeting = Dans cette réunion
+gm-group-links-off = Vous avez désactivé les réunions de groupe, vous ne pouvez donc pas y participer. Réactivez-les dans { $link }, ou ne vous incluez pas.
+gm-pick-two = Choisissez au moins deux personnes.
+gm-no-types-me = Vous n'avez pas encore de type de rendez-vous public. Créez-en un dans { $link } d'abord.
+gm-no-types = Aucune de ces personnes n'a encore de type de rendez-vous public, il n'y a donc rien à réserver. L'une d'elles doit d'abord en créer un.
+gm-meeting-type = Type de rendez-vous
+gm-meeting-type-hint = La durée, le lieu et les horaires viennent du type de rendez-vous de { $name }. Les agendas et les horaires de travail de chacun bloquent les créneaux.
+gm-common-times = Quand tout le monde est libre
+gm-times-tz = Horaires en { $tz }. Cliquez sur un créneau pour le réserver : vous remplissez les coordonnées de l'invité, et tout le monde reçoit l'invitation.
+gm-more-times = Voir tous les créneaux communs sur la page de réservation
+gm-no-times = Aucun créneau libre commun dans les { $days } prochains jours. Essayez avec moins de personnes ou un autre type de rendez-vous.
+gm-share = Lien pour l'invité
+gm-copy = Copier le lien
+gm-copied = Copié
+gm-open = Ouvrir la page de réservation
+gm-share-hint = L'invité ne voit que les créneaux où tout le monde est libre. Toute personne disposant du lien peut réserver.

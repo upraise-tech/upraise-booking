@@ -1,0 +1,145 @@
+{% extends "dashboard_base.html" %}
+{% block title %}{{ t("people-page-title") }} — Upraise Booking{% endblock %}
+{% block dashboard_content %}
+<style>
+  .people-tools { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem; }
+  .people-tools input[type="search"] { flex: 1 1 220px; padding: 0.55rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font: inherit; font-size: 0.9rem; }
+  .people-chips { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+  .people-chip { border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); border-radius: 999px; padding: 0.3rem 0.75rem; font: inherit; font-size: 0.8rem; cursor: pointer; }
+  .people-chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .person-row { display: flex; gap: 0.875rem; align-items: flex-start; padding: 0.875rem 0; border-bottom: 1px solid var(--border); }
+  .person-row:last-child { border-bottom: 0; }
+  .person-pick { margin-top: 0.55rem; width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+  .person-pick:disabled { opacity: 0.35; }
+  .person-main { flex: 1; min-width: 0; }
+  .person-name { font-weight: 600; }
+  .person-sub { color: var(--text-muted); font-size: 0.85rem; }
+  .person-teams { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.3rem; }
+  .person-ets { display: flex; gap: 0.375rem; flex-wrap: wrap; margin-top: 0.55rem; }
+  .person-ets .slot-btn { font-size: 0.8rem; text-decoration: none; padding: 0.3rem 0.65rem; }
+  .people-bar { position: sticky; bottom: 0.75rem; display: none; justify-content: space-between; align-items: center; gap: 0.75rem; margin-top: 1rem; padding: 0.75rem 1rem; border: 1px solid var(--accent); border-radius: var(--radius); background: var(--surface); box-shadow: 0 6px 20px rgba(15,23,42,0.12); }
+  .people-bar.on { display: flex; }
+  .people-bar .btn-go { background: var(--accent); color: #fff; border: 0; border-radius: var(--radius); padding: 0.5rem 0.9rem; font: inherit; font-weight: 600; font-size: 0.875rem; cursor: pointer; text-decoration: none; }
+</style>
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+    <h1 style="margin-bottom: 0;">{{ t("people-heading") }}</h1>
+    <a href="/dashboard/group-meeting" class="slot-btn" style="text-decoration: none; font-size: 0.85rem; font-weight: 600; color: var(--accent); border-color: var(--accent);">{{ t("nav-group-meeting") }}</a>
+  </div>
+  <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">{{ t("people-help") }}</p>
+
+  <div class="people-tools">
+    <input type="search" id="people-search" placeholder="{{ t('people-search') }}" aria-label="{{ t('people-search') }}">
+    {% if teams %}
+    <div class="people-chips" role="group" aria-label="{{ t('nav-teams') }}">
+      <button type="button" class="people-chip" data-team="" aria-pressed="{{ 'false' if selected_team else 'true' }}">{{ t("people-all-teams") }}</button>
+      {% for team in teams %}
+      <button type="button" class="people-chip" data-team="{{ team.slug }}" aria-pressed="{{ 'true' if selected_team == team.slug else 'false' }}">{{ team.name }}</button>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div id="people-list">
+    {% for p in people %}
+    <div class="person-row" data-search="{{ p.search }}" data-teams="{{ p.team_slugs }}">
+      {% if p.is_me %}
+        <input type="checkbox" class="person-pick" disabled aria-label="{{ t('people-you') }}">
+      {% else %}
+        <input type="checkbox" class="person-pick" value="{{ p.username }}" {% if not p.can_group %}disabled title="{{ t('people-group-off') }}"{% endif %} aria-label="{{ t('people-pick-aria', name=p.name) }}">
+      {% endif %}
+      <div class="avatar-circle" style="width: 36px; height: 36px; font-size: 0.75rem; flex-shrink: 0;">
+        {% if p.has_avatar %}<img src="/avatar/{{ p.id }}" alt="">{% else %}{{ p.initials }}{% endif %}
+      </div>
+      <div class="person-main">
+        <div><span class="person-name">{{ p.name }}</span>{% if p.is_me %} <span class="badge badge-info">{{ t("people-you") }}</span>{% endif %}</div>
+        {% if p.title %}<div class="person-sub">{{ p.title }}</div>{% endif %}
+        {% if p.teams %}<div class="person-teams">{% for team in p.teams %}<span class="badge badge-muted">{{ team.name }}</span>{% endfor %}</div>{% endif %}
+        <div class="person-ets">
+          <a href="/u/{{ p.username }}" target="_blank" rel="noopener" class="slot-btn" style="color: var(--accent); border-color: var(--accent); font-weight: 600;">{{ t("people-booking-page") }}</a>
+          {% for et in p.public_ets %}
+          <a href="/u/{{ p.username }}/{{ et.slug }}" target="_blank" rel="noopener" class="slot-btn">{{ et.title }} · {{ t("invite-links-duration", minutes=et.duration_min) }}</a>
+          {% endfor %}
+          {% for et in p.internal_ets %}
+          <button type="button" class="slot-btn quick-link-btn" data-et-id="{{ et.id }}" data-label="{{ et.title }} · {{ t('people-copy-invite') }}">{{ et.title }} · {{ t("people-copy-invite") }}</button>
+          {% endfor %}
+          {% if not p.public_ets and not p.internal_ets %}<span class="person-sub">{{ t("people-no-event-types") }}</span>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <p id="people-none" class="person-sub" style="display: none; padding: 1rem 0;">{{ t("people-empty") }}</p>
+  </div>
+
+  <div class="people-bar" id="people-bar" role="region" aria-live="polite">
+    <span id="people-count" style="font-size: 0.9rem;"></span>
+    <a href="/dashboard/group-meeting" class="btn-go" id="people-go">{{ t("people-find-time") }}</a>
+  </div>
+</div>
+
+<script>
+(function() {
+  var search = document.getElementById('people-search');
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.person-row'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.people-chip'));
+  var none = document.getElementById('people-none');
+  var team = {{ selected_team | tojson }};
+  var selectedLabel = {{ t('people-selected') | tojson }};
+
+  function apply() {
+    var q = (search.value || '').trim().toLowerCase();
+    var shown = 0;
+    rows.forEach(function(r) {
+      var ok = (!q || r.dataset.search.indexOf(q) >= 0) &&
+        (!team || (' ' + r.dataset.teams + ' ').indexOf(' ' + team + ' ') >= 0);
+      r.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    none.style.display = shown ? 'none' : '';
+  }
+  search.addEventListener('input', apply);
+  chips.forEach(function(c) {
+    c.addEventListener('click', function() {
+      team = c.dataset.team;
+      chips.forEach(function(x) { x.setAttribute('aria-pressed', x === c ? 'true' : 'false'); });
+      apply();
+    });
+  });
+  apply();
+
+  var bar = document.getElementById('people-bar'), count = document.getElementById('people-count'), go = document.getElementById('people-go');
+  function picks() {
+    var names = Array.prototype.slice.call(document.querySelectorAll('.person-pick:checked')).map(function(b) { return b.value; });
+    bar.classList.toggle('on', names.length > 0);
+    count.textContent = selectedLabel.replace('%1', names.length);
+    go.href = '/dashboard/group-meeting?with=' + encodeURIComponent(names.join(','));
+  }
+  document.querySelectorAll('.person-pick').forEach(function(b) { b.addEventListener('change', picks); });
+
+  function getCsrfToken() {
+    var match = document.cookie.match(/(?:^|;\s*)__Host-calrs_csrf=([^;]+)/);
+    return match ? match[1] : '';
+  }
+  document.querySelectorAll('.quick-link-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      btn.disabled = true;
+      btn.textContent = {{ t('invite-links-js-generating') | tojson }};
+      fetch('/dashboard/invites/' + btn.dataset.etId + '/quick-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: '_csrf=' + encodeURIComponent(getCsrfToken())
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.url) throw new Error('no url');
+        return navigator.clipboard.writeText(data.url).then(function() {
+          btn.textContent = {{ t('invite-links-js-copied') | tojson }};
+        });
+      })
+      .catch(function() { btn.textContent = {{ t('invite-links-js-error') | tojson }}; })
+      .then(function() { setTimeout(function() { btn.textContent = btn.dataset.label; btn.disabled = false; }, 2000); });
+    });
+  });
+})();
+</script>
+{% endblock %}

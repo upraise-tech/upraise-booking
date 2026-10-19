@@ -179,3 +179,21 @@ The **Teams** page in the dashboard shows all teams you belong to:
 - Member count
 - **Settings** link (visible to team admins)
 - Global admins see all teams and can create new ones
+
+## Team directory
+
+**Team directory** in the sidebar lists every member, whatever their team, with their teams, a link to their booking page and each meeting type you can book with them (internal ones get a one-click invite link). Search by name or title, or filter by team. Private teams are only shown to their members.
+
+Tick a few people and click **Find a time together** to open a group meeting with them.
+
+## Group meetings
+
+**Group meeting** in the sidebar sets up a meeting with any members, even when they are not on the same team:
+
+1. Pick the people. You are included unless you untick **Include me**; for a meeting between teammates only, leave yourself out and book it as the guest.
+2. Pick a meeting type. It comes from the first person with a public meeting type (you, when you have one): its length, location and hours apply, and everyone's calendars and working hours block time.
+3. The page lists the times when everyone is free over the next two weeks. Click one to book it: you fill in the guest's details (and up to 10 extra emails), and everyone gets the invite.
+4. Or copy the **link for the guest**: it opens a booking page that only offers the times when everyone is free.
+
+Group meetings use dynamic group links (`/u/alice+bob/meeting-type`), so a member who turned off group links in Profile & Settings can't be picked.
+
