@@ -76,6 +76,15 @@ async fn configure(pool: &SqlitePool, url: &str) {
     assert_eq!(n, 1, "auth_config singleton exists after migrate");
 }
 
+async fn set_sales(pool: &SqlitePool, et_id: &str, on: bool) {
+    sqlx::query("UPDATE event_types SET sales_meeting = ? WHERE id = ?")
+        .bind(on as i32)
+        .bind(et_id)
+        .execute(pool)
+        .await
+        .unwrap();
+}
+
 async fn insert_booking(
     pool: &SqlitePool,
     et_id: &str,
@@ -114,6 +123,7 @@ fn at(days: i64, hour: u32) -> String {
 async fn a_booking_is_sent_created_then_rescheduled_then_cancelled_once_each() {
     let pool = setup_test_db().await;
     let (_user, _account, et_id) = seed_test_data(&pool).await;
+    set_sales(&pool, &et_id, true).await;
     let (port, received) = spawn_receiver().await;
     configure(&pool, &format!("http://127.0.0.1:{}/hook", port)).await;
 
@@ -176,6 +186,7 @@ async fn a_booking_is_sent_created_then_rescheduled_then_cancelled_once_each() {
 async fn pending_requests_and_past_bookings_are_not_sent() {
     let pool = setup_test_db().await;
     let (_user, _account, et_id) = seed_test_data(&pool).await;
+    set_sales(&pool, &et_id, true).await;
     let (port, received) = spawn_receiver().await;
 
     // A past booking, from before the feature was switched on.
@@ -192,6 +203,7 @@ async fn pending_requests_and_past_bookings_are_not_sent() {
 async fn a_failed_delivery_is_recorded_and_retried() {
     let pool = setup_test_db().await;
     let (_user, _account, et_id) = seed_test_data(&pool).await;
+    set_sales(&pool, &et_id, true).await;
     // Nothing listens on this port.
     let closed = {
         let l = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
@@ -222,4 +234,76 @@ async fn a_failed_delivery_is_recorded_and_retried() {
             .await
             .unwrap();
     assert_eq!(sent.0.as_deref(), Some("confirmed"));
+}
+
+#[tokio::test]
+async fn only_bookings_of_sales_meetings_are_sent() {
+    let pool = setup_test_db().await;
+    let (_user, account_id, internal_et) = seed_test_data(&pool).await;
+    let sales_et = uuid::Uuid::new_v4().to_string();
+    sqlx::query(
+        "INSERT INTO event_types (id, account_id, slug, title, duration_min, enabled, sales_meeting) VALUES (?, ?, 'discovery', 'Discovery call', 30, 1, 1)",
+    )
+    .bind(&sales_et)
+    .bind(&account_id)
+    .execute(&pool)
+    .await
+    .unwrap();
+    let (port, received) = spawn_receiver().await;
+    configure(&pool, &format!("http://127.0.0.1:{}/hook", port)).await;
+
+    let internal = insert_booking(&pool, &internal_et, "confirmed", &at(3, 9), &at(3, 10)).await;
+    let sales = insert_booking(&pool, &sales_et, "confirmed", &at(3, 11), &at(3, 12)).await;
+    crate::web::booking_events::deliver_due(&pool, &KEY).await;
+
+    {
+        let got = received.lock().unwrap();
+        assert_eq!(got.len(), 1, "only the sales meeting is sent");
+        let v: serde_json::Value = serde_json::from_str(&body(&got[0])).unwrap();
+        assert_eq!(v["payload"]["uid"], format!("{}@calrs", sales));
+        assert_eq!(v["payload"]["title"], "Discovery call");
+    }
+    let internal_rows: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM booking_event_deliveries WHERE booking_id = ?")
+            .bind(&internal)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+    assert_eq!(
+        internal_rows.0, 0,
+        "an internal meeting leaves no delivery row"
+    );
+}
+
+#[tokio::test]
+async fn a_delivered_booking_still_sends_its_cancellation_after_the_switch_is_turned_off() {
+    let pool = setup_test_db().await;
+    let (_user, _account, et_id) = seed_test_data(&pool).await;
+    set_sales(&pool, &et_id, true).await;
+    let (port, received) = spawn_receiver().await;
+    configure(&pool, &format!("http://127.0.0.1:{}/hook", port)).await;
+
+    let id = insert_booking(&pool, &et_id, "confirmed", &at(3, 9), &at(3, 10)).await;
+    crate::web::booking_events::deliver_due(&pool, &KEY).await;
+    assert_eq!(received.lock().unwrap().len(), 1);
+
+    set_sales(&pool, &et_id, false).await;
+    // A new booking on the now-internal event type is not sent.
+    insert_booking(&pool, &et_id, "confirmed", &at(5, 9), &at(5, 10)).await;
+    sqlx::query("UPDATE bookings SET status = 'cancelled' WHERE id = ?")
+        .bind(&id)
+        .execute(&pool)
+        .await
+        .unwrap();
+    crate::web::booking_events::deliver_due(&pool, &KEY).await;
+
+    let got = received.lock().unwrap();
+    assert_eq!(
+        got.len(),
+        2,
+        "the cancellation goes out, the new internal booking does not"
+    );
+    let v: serde_json::Value = serde_json::from_str(&body(&got[1])).unwrap();
+    assert_eq!(v["triggerEvent"], "BOOKING_CANCELLED");
+    assert_eq!(v["payload"]["uid"], format!("{}@calrs", id));
 }

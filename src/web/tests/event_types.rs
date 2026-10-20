@@ -1093,3 +1093,138 @@ async fn team_event_type_create_and_edit_refuse_invalid_input() {
     assert!(response.status().is_redirection());
     assert_eq!(event_type_count(&pool).await, before + 1);
 }
+
+// --- Sales meeting switch (Booking events) ---
+
+async fn sales_flag(pool: &SqlitePool, slug: &str) -> i32 {
+    sqlx::query_scalar("SELECT sales_meeting FROM event_types WHERE slug = ?")
+        .bind(slug)
+        .fetch_one(pool)
+        .await
+        .unwrap()
+}
+
+async fn set_booking_events_url(pool: &SqlitePool, url: Option<&str>) {
+    sqlx::query("UPDATE auth_config SET booking_events_url = ? WHERE id = 'singleton'")
+        .bind(url)
+        .execute(pool)
+        .await
+        .unwrap();
+}
+
+#[tokio::test]
+async fn sales_meeting_switch_shows_only_when_booking_events_is_configured() {
+    let (app, pool, session, _) = setup_test_app().await;
+    let body = body_string(
+        app.oneshot(get_authed("/dashboard/event-types/new", &session))
+            .await
+            .unwrap(),
+    )
+    .await;
+    assert!(!body.contains("name=\"sales_meeting\""));
+
+    set_booking_events_url(&pool, Some("https://outreach.example.com/hook")).await;
+    let app = create_router(pool.clone(), std::env::temp_dir(), [0u8; 32]).await;
+    let body = body_string(
+        app.oneshot(get_authed("/dashboard/event-types/new", &session))
+            .await
+            .unwrap(),
+    )
+    .await;
+    assert!(body.contains("name=\"sales_meeting\""));
+    assert!(body.contains("name=\"sales_meeting_shown\""));
+}
+
+#[tokio::test]
+async fn sales_meeting_persists_on_create_and_update() {
+    let (app, pool, session, _) = setup_test_app().await;
+    set_booking_events_url(&pool, Some("https://outreach.example.com/hook")).await;
+    let csrf = "test-csrf-sales";
+    let base = "title=Sales+Call&slug=sales-call&duration_min=30&location_value=https%3A%2F%2Fmeet.example.com&avail_days=1,2,3,4,5&avail_start=09:00&avail_end=17:00";
+
+    let response = app
+        .oneshot(post_form(
+            "/dashboard/event-types/new",
+            &session,
+            csrf,
+            &format!(
+                "_csrf={}&{}&sales_meeting_shown=1&sales_meeting=on",
+                csrf, base
+            ),
+        ))
+        .await
+        .unwrap();
+    assert!(response.status().is_redirection());
+    assert_eq!(sales_flag(&pool, "sales-call").await, 1);
+
+    // The edit form shows it checked.
+    let app = create_router(pool.clone(), std::env::temp_dir(), [0u8; 32]).await;
+    let body = body_string(
+        app.oneshot(get_authed(
+            "/dashboard/event-types/sales-call/edit",
+            &session,
+        ))
+        .await
+        .unwrap(),
+    )
+    .await;
+    assert!(body.contains("name=\"sales_meeting\" checked"));
+
+    // A form that carried the switch unchecked turns it off.
+    let app = create_router(pool.clone(), std::env::temp_dir(), [0u8; 32]).await;
+    let response = app
+        .oneshot(post_form(
+            "/dashboard/event-types/sales-call/edit",
+            &session,
+            csrf,
+            &format!("_csrf={}&{}&sales_meeting_shown=1", csrf, base),
+        ))
+        .await
+        .unwrap();
+    assert!(response.status().is_redirection());
+    assert_eq!(sales_flag(&pool, "sales-call").await, 0);
+
+    // A form without the switch (Booking events off) keeps the stored value.
+    sqlx::query("UPDATE event_types SET sales_meeting = 1 WHERE slug = 'sales-call'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    let app = create_router(pool.clone(), std::env::temp_dir(), [0u8; 32]).await;
+    let response = app
+        .oneshot(post_form(
+            "/dashboard/event-types/sales-call/edit",
+            &session,
+            csrf,
+            &format!("_csrf={}&{}", csrf, base),
+        ))
+        .await
+        .unwrap();
+    assert!(response.status().is_redirection());
+    assert_eq!(sales_flag(&pool, "sales-call").await, 1);
+}
+
+#[tokio::test]
+async fn sales_badge_shows_on_the_event_types_list() {
+    let (app, pool, session, _) = setup_test_app().await;
+    let badge = crate::i18n::translate("en", "event-types-badge-sales-title", None);
+    let body = body_string(
+        app.oneshot(get_authed("/dashboard/event-types", &session))
+            .await
+            .unwrap(),
+    )
+    .await;
+    assert!(!body.contains(&badge));
+
+    sqlx::query("UPDATE event_types SET sales_meeting = 1 WHERE slug = 'test-meeting'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    let app = create_router(pool.clone(), std::env::temp_dir(), [0u8; 32]).await;
+    let body = body_string(
+        app.oneshot(get_authed("/dashboard/event-types", &session))
+            .await
+            .unwrap(),
+    )
+    .await;
+    assert!(body.contains(&badge));
+}

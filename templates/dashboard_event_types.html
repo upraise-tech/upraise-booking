@@ -27,6 +27,7 @@
           {% if et.visibility == "internal" %}<span class="badge badge-info">{{ t("event-types-badge-internal") }}</span>{% endif %}
           {% if et.visibility == "private" %}<span class="badge badge-muted">{{ t("event-types-badge-private") }}</span>{% endif %}
           {% if et.resource_names %}<span class="badge badge-muted" title="{{ et.resource_names }}">{{ t("event-types-badge-resources") }}</span>{% endif %}
+          {% if et.sales_meeting %}<span class="badge badge-info" title="{{ t('event-types-badge-sales-title') }}">{{ t("event-types-badge-sales") }}</span>{% endif %}
           {% if et.visibility == "private" or et.visibility == "internal" %}
             <a href="/dashboard/invites/{{ et.id }}" style="font-size: 0.75rem; color: var(--accent); text-decoration: none; margin-left: 0.25rem;">{{ t("event-types-send-invites") }} &rarr;</a>
           {% endif %}

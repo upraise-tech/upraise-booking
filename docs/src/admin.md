@@ -69,6 +69,14 @@ The **SMS settings** card configures the instance's [SMS gateway](./sms.md): pic
 
 SMS spends real money on a public form, so the card also warns when SMS is configured without a captcha. See [SMS Notifications](./sms.md) for the setup steps and for keeping the bill bounded.
 
+## Booking events (Upraise Outreach)
+
+The **Upraise Outreach (booking events)** card sends bookings to one address in the Cal.com webhook format (`BOOKING_CREATED`, `BOOKING_RESCHEDULED`, `BOOKING_CANCELLED`), signed with `X-Cal-Signature-256` when a signing key is set. Upraise Outreach uses them to create CRM tasks and send the meeting notetaker.
+
+Only **sales meetings** are sent: bookings of event types with the **Sales meeting** switch on (see [Event Types](./event-types.md#sales-meeting)). Internal, SEO and technical meetings leave the switch off and never reach the sales system. Pending requests are sent once approved.
+
+Delivery is checked once a minute and a failed delivery is retried on the next pass; the card shows the last successful delivery and how many bookings are waiting for a retry. Saving an address for the first time marks past bookings as already reported, so only upcoming bookings are sent. Leave the address empty to stop sending.
+
 ## SMTP status
 
 Shows whether SMTP is configured and the current sender address. SMTP is configured via CLI (`calrs config smtp`) or by editing the database directly.

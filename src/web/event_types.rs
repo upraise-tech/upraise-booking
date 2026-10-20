@@ -235,6 +235,48 @@ pub(super) struct EventTypeForm {
     // "never" or a number of hours from PENDING_EXPIRY_CHOICES. Its presence
     // is also the marker that the form carried the section at all.
     pub(super) pending_expiry_hours: Option<String>,
+    // Sales meeting: bookings go to Booking events (Upraise Outreach and the
+    // notetaker). Checkbox: "on" or absent; `sales_meeting_shown` marks that
+    // the form carried it, so a form without it keeps the stored value.
+    pub(super) sales_meeting: Option<String>,
+    pub(super) sales_meeting_shown: Option<String>,
+}
+
+/// Template context for the "Sales meeting" switch: shown only when Booking
+/// events is configured, since nothing reads it otherwise.
+async fn sales_form_ctx(pool: &SqlitePool, on: bool) -> minijinja::Value {
+    context! {
+        available => super::booking_events::is_configured(pool).await,
+        on => on,
+    }
+}
+
+async fn load_sales_meeting(pool: &SqlitePool, et_id: &str) -> bool {
+    sqlx::query_scalar::<_, i32>("SELECT sales_meeting FROM event_types WHERE id = ?")
+        .bind(et_id)
+        .fetch_optional(pool)
+        .await
+        .ok()
+        .flatten()
+        .is_some_and(|v| v != 0)
+}
+
+/// Persist the "Sales meeting" switch when the form carried it. A form
+/// without it (Booking events not configured) keeps the stored value on edit
+/// and the column default (off) on create.
+pub(super) async fn save_sales_meeting(pool: &SqlitePool, et_id: &str, form: &EventTypeForm) {
+    if form.sales_meeting_shown.is_none() {
+        return;
+    }
+    let on = form.sales_meeting.as_deref() == Some("on");
+    if let Err(e) = sqlx::query("UPDATE event_types SET sales_meeting = ? WHERE id = ?")
+        .bind(on as i32)
+        .bind(et_id)
+        .execute(pool)
+        .await
+    {
+        tracing::warn!(event_type_id = %et_id, error = %e, "cannot save sales meeting setting");
+    }
 }
 
 /// Longest event type title accepted, the same limit as team names.
@@ -629,6 +671,7 @@ pub(super) async fn new_event_type_form(
             form_reschedule_notice_unit => "minutes",
             form_booking_horizon_days => "",
             form_pending => PendingSettings::DEFAULT.context(),
+            form_sales => sales_form_ctx(&state.pool, false).await,
             tz_options => common_timezones_with(&user.timezone)
                 .iter()
                 .map(|(iana, label)| context! { value => iana, label => label })
@@ -829,6 +872,7 @@ pub(super) async fn create_event_type(
     .execute(&state.pool)
     .await;
     save_pending_settings(&state.pool, &et_id, &form, true).await;
+    save_sales_meeting(&state.pool, &et_id, &form).await;
 
     tracing::info!(slug = %slug, user = %auth_user.user.email, "event type created");
 
@@ -1277,6 +1321,7 @@ pub(super) async fn edit_event_type_form(
             form_reschedule_notice_unit => form_reschedule_notice_unit,
             form_booking_horizon_days => form_booking_horizon_days,
             form_pending => form_pending,
+            form_sales => sales_form_ctx(&state.pool, load_sales_meeting(&state.pool, &et_id).await).await,
             tz_options => common_timezones_with(&form_timezone)
                 .iter()
                 .map(|(iana, label)| context! { value => iana, label => label })
@@ -1467,6 +1512,7 @@ pub(super) async fn update_event_type(
     .execute(&state.pool)
     .await;
     save_pending_settings(&state.pool, &et_id, &form, false).await;
+    save_sales_meeting(&state.pool, &et_id, &form).await;
 
     // Update availability rules: delete old, insert new. Pass the user's
     // profile-default schedule as a fallback so an empty submission falls back
@@ -1853,6 +1899,7 @@ async fn render_event_type_form_error(
             form_pending => PendingSettings::from_form(form)
                 .unwrap_or(PendingSettings::DEFAULT)
                 .context(),
+            form_sales => sales_form_ctx(&state.pool, form.sales_meeting.as_deref() == Some("on")).await,
             tz_options => common_timezones_with(form.timezone.as_deref().unwrap_or(&auth_user.user.timezone))
                 .iter()
                 .map(|(iana, label)| context! { value => iana, label => label })
@@ -2154,6 +2201,7 @@ pub(super) async fn new_group_event_type_form(
             form_frequency_limits => "",
             form_booking_horizon_days => "",
             form_pending => PendingSettings::DEFAULT.context(),
+            form_sales => sales_form_ctx(&state.pool, false).await,
             form_timezone => &user.timezone,
             tz_options => common_timezones_with(&user.timezone)
                 .iter()
@@ -2329,6 +2377,7 @@ pub(super) async fn create_group_event_type(
     .execute(&state.pool)
     .await;
     save_pending_settings(&state.pool, &et_id, &form, true).await;
+    save_sales_meeting(&state.pool, &et_id, &form).await;
 
     // Create availability rules. Pass the creating user's profile-default
     // schedule as a fallback so an empty submission falls back to it instead
@@ -2736,6 +2785,7 @@ pub(super) async fn edit_group_event_type_form(
             form_reschedule_notice_unit => form_reschedule_notice_unit,
             form_booking_horizon_days => form_booking_horizon_days,
             form_pending => form_pending,
+            form_sales => sales_form_ctx(&state.pool, load_sales_meeting(&state.pool, &et_id).await).await,
             tz_options => common_timezones_with(&form_timezone)
                 .iter()
                 .map(|(iana, label)| context! { value => iana, label => label })
@@ -2942,6 +2992,7 @@ pub(super) async fn update_group_event_type(
     .execute(&state.pool)
     .await;
     save_pending_settings(&state.pool, &et_id, &form, false).await;
+    save_sales_meeting(&state.pool, &et_id, &form).await;
 
     // Update availability rules. Pass the editing user's profile-default
     // schedule as a fallback so an empty submission falls back to it instead

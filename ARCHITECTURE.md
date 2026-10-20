@@ -81,7 +81,7 @@ Every user-facing string goes through Fluent (`i18n/`).
 | `pending.rs` | Pending requests: expiry deadline, sweep (expire and nudge), pending settings on event types |
 | `notify.rs` | `spawn_emails` / `drain_emails`, new-booking notifications, reminders, watchers, SMS on new booking, the background loop |
 | `meeting.rs` | Auto-generated meeting links (Jitsi, webhook, Google Meet) |
-| `booking_events.rs` | Booked / rescheduled / cancelled bookings sent to a CRM (Upraise Outreach) in the Cal.com webhook format, reconciled once a minute against `booking_event_deliveries` |
+| `booking_events.rs` | Booked / rescheduled / cancelled bookings sent to a CRM (Upraise Outreach) in the Cal.com webhook format, reconciled once a minute against `booking_event_deliveries`; only event types with `sales_meeting = 1` (the "Sales meeting" switch, migration 074), plus bookings already delivered |
 | `captcha.rs` | Cap captcha config and server-side verification |
 | `dashboard.rs` | Dashboard overview, event types and bookings lists, host cancel/confirm, settings, avatar |
 | `event_types.rs` | Event type forms (personal and team), availability overrides, form parsing helpers |
