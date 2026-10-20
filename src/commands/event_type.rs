@@ -185,18 +185,24 @@ pub async fn run(pool: &SqlitePool, cmd: EventTypeCommands) -> Result<()> {
             .execute(pool)
             .await?;
 
-            // Add default availability: Mon-Fri 09:00-17:00
-            for day in [1, 2, 3, 4, 5] {
-                let rule_id = Uuid::new_v4().to_string();
-                sqlx::query(
-                    "INSERT INTO availability_rules (id, event_type_id, day_of_week, start_time, end_time)
-                     VALUES (?, ?, ?, '09:00', '17:00')",
-                )
-                .bind(&rule_id)
-                .bind(&id)
-                .bind(day)
-                .execute(pool)
-                .await?;
+            // Add the instance default availability (CALRS_DEFAULT_AVAILABILITY,
+            // else Mon-Fri 09:00-17:00).
+            let default_schedule = crate::defaults::availability();
+            for (day, windows) in &default_schedule {
+                for (start, end) in windows {
+                    let rule_id = Uuid::new_v4().to_string();
+                    sqlx::query(
+                        "INSERT INTO availability_rules (id, event_type_id, day_of_week, start_time, end_time)
+                         VALUES (?, ?, ?, ?, ?)",
+                    )
+                    .bind(&rule_id)
+                    .bind(&id)
+                    .bind(day)
+                    .bind(start)
+                    .bind(end)
+                    .execute(pool)
+                    .await?;
+                }
             }
 
             println!(
@@ -208,8 +214,11 @@ pub async fn run(pool: &SqlitePool, cmd: EventTypeCommands) -> Result<()> {
             );
             println!(
                 "{}",
-                "Default availability: Mon–Fri 09:00–17:00. View slots with `calrs event-type slots`."
-                    .dimmed()
+                format!(
+                    "Default availability: {}. View slots with `calrs event-type slots`.",
+                    crate::defaults::describe(&default_schedule)
+                )
+                .dimmed()
             );
         }
         EventTypeCommands::List => {

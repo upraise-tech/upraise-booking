@@ -29,10 +29,13 @@ pub(super) fn parse_avail_windows(
             return parsed;
         }
     }
-    // Fallback to legacy single window
+    // Fallback to legacy single window; a missing bound comes from the
+    // instance default availability (`CALRS_DEFAULT_AVAILABILITY`).
+    let (default_start, default_end) =
+        crate::defaults::first_window(&crate::defaults::availability());
     vec![(
-        legacy_start.unwrap_or("09:00").to_string(),
-        legacy_end.unwrap_or("17:00").to_string(),
+        legacy_start.map_or(default_start, str::to_string),
+        legacy_end.map_or(default_end, str::to_string),
     )]
 }
 
@@ -83,9 +86,10 @@ fn parse_schedule_string(s: &str) -> std::collections::BTreeMap<i32, Vec<(String
 
 /// Parse per-day availability schedule.
 /// Resolution order: submitted `schedule` (new format) → `user_default` (new format,
-/// e.g. the user's profile default availability) → legacy form fields → hardcoded
-/// Mon–Fri 09:00–17:00. The `user_default` step is what stops an empty submission
-/// from silently snapping back to the hardcoded default.
+/// e.g. the user's profile default availability) → legacy form fields → the
+/// instance default (`CALRS_DEFAULT_AVAILABILITY`, else Mon–Fri 09:00–17:00).
+/// The `user_default` step is what stops an empty submission from silently
+/// snapping back to the instance default.
 pub(super) fn parse_avail_schedule(
     schedule: Option<&str>,
     legacy_days: Option<&str>,
@@ -108,9 +112,20 @@ pub(super) fn parse_avail_schedule(
         }
     }
 
+    // Nothing submitted in any format: the instance default, as is.
+    if legacy_days.is_none()
+        && legacy_windows.is_none_or(|w| w.trim().is_empty())
+        && legacy_start.is_none()
+        && legacy_end.is_none()
+    {
+        return crate::defaults::availability();
+    }
+
     // Fall back to legacy format
     let mut result = std::collections::BTreeMap::new();
-    let days_str = legacy_days.unwrap_or("1,2,3,4,5");
+    let days_str = legacy_days
+        .map(str::to_string)
+        .unwrap_or_else(|| crate::defaults::days_csv(&crate::defaults::availability()));
     let windows = parse_avail_windows(legacy_windows, legacy_start, legacy_end);
     for day_str in days_str.split(',') {
         if let Ok(day) = day_str.trim().parse::<i32>() {
@@ -171,8 +186,8 @@ pub(super) async fn user_avail_as_busy(
         .bind(user_id)
         .fetch_one(pool)
         .await
-        .unwrap_or_else(|_| "UTC".to_string());
-    let user_tz: chrono_tz::Tz = user_tz_str.parse().unwrap_or(chrono_tz::Tz::UTC);
+        .unwrap_or_default();
+    let user_tz: chrono_tz::Tz = user_tz_str.parse().unwrap_or_else(|_| server_tz());
 
     // Work in the participant's timezone: convert window bounds from host TZ to user TZ
     let window_start_user = host_tz
@@ -318,7 +333,8 @@ pub(super) async fn save_user_avail_schedule(pool: &SqlitePool, user_id: &str, s
     }
 }
 
-/// Ensure a user has default availability rules. If none exist, insert Mon-Fri 9:00-17:00.
+/// Ensure a user has default availability rules. If none exist, insert the
+/// instance default (`CALRS_DEFAULT_AVAILABILITY`, else Mon-Fri 09:00-17:00).
 pub(super) async fn ensure_user_avail_seeded(pool: &SqlitePool, user_id: &str) {
     let count: (i64,) =
         sqlx::query_as("SELECT COUNT(*) FROM user_availability_rules WHERE user_id = ?")
@@ -329,17 +345,20 @@ pub(super) async fn ensure_user_avail_seeded(pool: &SqlitePool, user_id: &str) {
     if count.0 > 0 {
         return;
     }
-    // Seed Mon(1)-Fri(5) 09:00-17:00
-    for day in 1..=5 {
-        let id = uuid::Uuid::new_v4().to_string();
-        let _ = sqlx::query(
-            "INSERT INTO user_availability_rules (id, user_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, '09:00', '17:00')",
-        )
-        .bind(&id)
-        .bind(user_id)
-        .bind(day)
-        .execute(pool)
-        .await;
+    for (day, windows) in crate::defaults::availability() {
+        for (start, end) in windows {
+            let id = uuid::Uuid::new_v4().to_string();
+            let _ = sqlx::query(
+                "INSERT INTO user_availability_rules (id, user_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?, ?)",
+            )
+            .bind(&id)
+            .bind(user_id)
+            .bind(day)
+            .bind(&start)
+            .bind(&end)
+            .execute(pool)
+            .await;
+        }
     }
 }
 
@@ -1516,8 +1535,6 @@ pub(super) fn normalize_event_type_tz(input: Option<&str>, fallback: &str) -> St
         .unwrap_or_else(|| fallback.to_string())
 }
 
-/// Get the host's timezone from the event type owner's profile.
-/// Falls back to UTC when no valid timezone is configured.
 /// Convert a naive datetime in the guest's timezone to the equivalent naive
 /// datetime in the host's timezone. Used when accepting a booking: the URL
 /// carries the time the guest clicked (their local time), but availability
@@ -1575,6 +1592,9 @@ pub(super) fn horizon_last_date(
     })
 }
 
+/// Get the host's timezone: the event type's own, else its owner's profile.
+/// Falls back to the instance default (`CALRS_DEFAULT_TIMEZONE`, else UTC)
+/// when neither is a valid timezone.
 pub(super) async fn get_host_tz(pool: &SqlitePool, et_id: &str) -> Tz {
     if !et_id.is_empty() {
         // Prefer the explicit event-type timezone (migration 046). Falls back
@@ -1600,7 +1620,7 @@ pub(super) async fn get_host_tz(pool: &SqlitePool, et_id: &str) -> Tz {
     server_tz()
 }
 
-/// Get a user's timezone from their profile. Falls back to UTC.
+/// Get a user's timezone from their profile. Falls back to the instance default.
 async fn get_user_tz(pool: &SqlitePool, user_id: &str) -> Tz {
     if let Some(tz_str) = sqlx::query_scalar::<_, String>("SELECT timezone FROM users WHERE id = ?")
         .bind(user_id)
@@ -1616,9 +1636,9 @@ async fn get_user_tz(pool: &SqlitePool, user_id: &str) -> Tz {
     server_tz()
 }
 
-/// Deterministic default for missing timezone configuration.
+/// Default for missing timezone configuration: `CALRS_DEFAULT_TIMEZONE`, else UTC.
 fn server_tz() -> Tz {
-    Tz::UTC
+    crate::defaults::timezone()
 }
 
 /// Common IANA timezones for the selector (most used ones).

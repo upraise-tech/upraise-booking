@@ -782,8 +782,8 @@ pub(super) async fn settings_save(
         .as_deref()
         .map(|s| s.trim())
         .filter(|s| !s.is_empty() && s.parse::<chrono_tz::Tz>().is_ok())
-        .unwrap_or("UTC")
-        .to_string();
+        .map(str::to_string)
+        .unwrap_or_else(crate::defaults::timezone_name);
 
     // Empty / "auto" / unsupported codes all map to NULL = follow Accept-Language.
     let language: Option<String> = form

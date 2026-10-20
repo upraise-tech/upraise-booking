@@ -1170,6 +1170,21 @@ function sub(tpl, a, b) {
     // Parse schedule from hidden field or build defaults
     var schedule = {}; // { dayNum: [{start:'09:00', end:'17:00'}, ...] }
 
+    // Instance default availability (CALRS_DEFAULT_AVAILABILITY), else Mon-Fri 09:00-17:00.
+    var defaultScheduleStr = {{ default_avail_schedule | default('') | tojson }};
+    function defaultSchedule() {
+      var s = parseSchedule(defaultScheduleStr);
+      if (!Object.keys(s).length) {
+        for (var d = 1; d <= 5; d++) { s[d] = [{ start: '09:00', end: '17:00' }]; }
+      }
+      return s;
+    }
+    function defaultWindow() {
+      var s = defaultSchedule();
+      var w = s[Object.keys(s)[0]][0];
+      return { start: w.start, end: w.end };
+    }
+
     function parseSchedule(str) {
       var s = {};
       if (!str || !str.trim()) return s;
@@ -1260,7 +1275,7 @@ function sub(tpl, a, b) {
         toggle.addEventListener('change', (function(day) {
           return function() {
             if (this.checked) {
-              schedule[day] = [{ start: '09:00', end: '17:00' }];
+              schedule[day] = [defaultWindow()];
             } else {
               delete schedule[day];
             }
@@ -1306,7 +1321,7 @@ function sub(tpl, a, b) {
               addBtn.style.cssText = 'padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.85rem;line-height:1;';
               addBtn.addEventListener('click', (function(day) {
                 return function() {
-                  schedule[day].push({ start: '09:00', end: '17:00' });
+                  schedule[day].push(defaultWindow());
                   renderSchedule();
                   serializeSchedule();
                 };
@@ -1405,11 +1420,9 @@ function sub(tpl, a, b) {
     if (savedSchedule) {
       schedule = parseSchedule(savedSchedule);
     }
-    // Fallback: if empty, default Mon-Fri 09:00-17:00
+    // Fallback: if empty, the instance default availability
     if (!Object.keys(schedule).length) {
-      for (var d = 1; d <= 5; d++) {
-        schedule[d] = [{ start: '09:00', end: '17:00' }];
-      }
+      schedule = defaultSchedule();
     }
     renderSchedule();
     serializeSchedule();

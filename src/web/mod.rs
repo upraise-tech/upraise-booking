@@ -549,6 +549,12 @@ pub async fn create_router(pool: SqlitePool, data_dir: PathBuf, secret_key: [u8;
     env.set_undefined_behavior(minijinja::UndefinedBehavior::Lenient);
     env.set_loader(minijinja::path_loader("templates"));
     crate::i18n::register(&mut env);
+    // The schedule editors' client-side default (CALRS_DEFAULT_AVAILABILITY),
+    // read once at startup like the rest of the process environment.
+    env.add_global(
+        "default_avail_schedule",
+        crate::defaults::availability_string(),
+    );
 
     // Populate the process-global runtime-settings cache (base URL, private-host
     // allowlist) so synchronous readers and email/link builders see DB values.

@@ -105,11 +105,12 @@ pub async fn run(pool: &SqlitePool, data_dir: &Path, cmd: UserCommands) -> Resul
             } else {
                 let account_id = Uuid::new_v4().to_string();
                 sqlx::query(
-                    "INSERT INTO accounts (id, name, email, timezone, user_id) VALUES (?, ?, ?, 'UTC', ?)",
+                    "INSERT INTO accounts (id, name, email, timezone, user_id) VALUES (?, ?, ?, ?, ?)",
                 )
                 .bind(&account_id)
                 .bind(&name)
                 .bind(&email)
+                .bind(crate::defaults::timezone_name())
                 .bind(&user_id)
                 .execute(pool)
                 .await?;
