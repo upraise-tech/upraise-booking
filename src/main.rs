@@ -12,6 +12,7 @@ mod caldav;
 mod commands;
 mod crypto;
 mod db;
+mod defaults;
 mod email;
 mod ews;
 mod google_meet;

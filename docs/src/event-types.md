@@ -90,7 +90,7 @@ Turning the switch off stops new bookings of that event type from being sent. A 
 
 ## Availability schedule
 
-Each event type has its own availability rules. By default: Monday–Friday, 09:00–17:00.
+Each event type has its own availability rules. A new event type starts from your profile's default availability, which itself starts from the instance default: Monday–Friday, 09:00–17:00, unless the operator set `CALRS_DEFAULT_AVAILABILITY` (and `CALRS_DEFAULT_TIMEZONE` for the timezone new users get); see [Deployment > Environment variables](./deployment.md#environment-variables).
 
 From the dashboard form, you can set:
 

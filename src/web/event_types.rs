@@ -877,8 +877,8 @@ pub(super) async fn create_event_type(
     tracing::info!(slug = %slug, user = %auth_user.user.email, "event type created");
 
     // Create availability rules. Pass the user's profile-default schedule as a
-    // fallback so an empty submission falls back to it instead of hardcoded
-    // Mon-Fri 09:00-17:00.
+    // fallback so an empty submission falls back to it instead of the
+    // instance default (CALRS_DEFAULT_AVAILABILITY, else Mon-Fri 09:00-17:00).
     ensure_user_avail_seeded(&state.pool, &auth_user.user.id).await;
     let user_default = load_user_avail_schedule(&state.pool, &auth_user.user.id).await;
     let schedule = parse_avail_schedule(
@@ -1124,7 +1124,7 @@ pub(super) async fn edit_event_type_form(
     let (avail_start, avail_end) = windows
         .first()
         .cloned()
-        .unwrap_or_else(|| ("09:00".to_string(), "17:00".to_string()));
+        .unwrap_or_else(|| crate::defaults::first_window(&crate::defaults::availability()));
 
     // Build per-day schedule string
     let avail_schedule = build_avail_schedule(&all_rules);
@@ -1516,7 +1516,7 @@ pub(super) async fn update_event_type(
 
     // Update availability rules: delete old, insert new. Pass the user's
     // profile-default schedule as a fallback so an empty submission falls back
-    // to it instead of hardcoded Mon-Fri 09:00-17:00.
+    // to it instead of the instance default availability.
     let _ = sqlx::query("DELETE FROM availability_rules WHERE event_type_id = ?")
         .bind(&et_id)
         .execute(&state.pool)
@@ -1848,6 +1848,10 @@ async fn render_event_type_form_error(
         .map(|(id, name)| context! { id => id, name => name })
         .collect();
 
+    // Legacy availability fields left blank fall back to the instance default.
+    let default_schedule = crate::defaults::availability();
+    let default_window = crate::defaults::first_window(&default_schedule);
+
     let (impersonating, impersonating_name, _) = impersonation_ctx(auth_user);
     Html(
         tmpl.render(context! {
@@ -1871,9 +1875,9 @@ async fn render_event_type_form_error(
             form_location_type => form.location_type.as_deref().unwrap_or("link"),
             form_location_value => form.location_value.as_deref().unwrap_or(""),
             form_meeting_pattern_override => form.meeting_pattern_override.as_deref().unwrap_or(""),
-            form_avail_days => form.avail_days.as_deref().unwrap_or("1,2,3,4,5"),
-            form_avail_start => form.avail_start.as_deref().unwrap_or("09:00"),
-            form_avail_end => form.avail_end.as_deref().unwrap_or("17:00"),
+            form_avail_days => form.avail_days.clone().unwrap_or_else(|| crate::defaults::days_csv(&default_schedule)),
+            form_avail_start => form.avail_start.clone().unwrap_or_else(|| default_window.0.clone()),
+            form_avail_end => form.avail_end.clone().unwrap_or_else(|| default_window.1.clone()),
             form_avail_windows => form.avail_windows.as_deref().unwrap_or(""),
             form_avail_schedule => form.avail_schedule.as_deref().unwrap_or(""),
             form_max_additional_guests => parse_int_field(&form.max_additional_guests, DEFAULT_ADDITIONAL_GUESTS),
@@ -2381,7 +2385,7 @@ pub(super) async fn create_group_event_type(
 
     // Create availability rules. Pass the creating user's profile-default
     // schedule as a fallback so an empty submission falls back to it instead
-    // of hardcoded Mon-Fri 09:00-17:00.
+    // of the instance default availability.
     ensure_user_avail_seeded(&state.pool, &user.id).await;
     let user_default = load_user_avail_schedule(&state.pool, &user.id).await;
     let schedule = parse_avail_schedule(
@@ -2625,7 +2629,7 @@ pub(super) async fn edit_group_event_type_form(
     let (avail_start, avail_end) = windows
         .first()
         .cloned()
-        .unwrap_or_else(|| ("09:00".to_string(), "17:00".to_string()));
+        .unwrap_or_else(|| crate::defaults::first_window(&crate::defaults::availability()));
 
     // Build per-day schedule string
     let avail_schedule = build_avail_schedule(&all_rules);
@@ -2996,7 +3000,7 @@ pub(super) async fn update_group_event_type(
 
     // Update availability rules. Pass the editing user's profile-default
     // schedule as a fallback so an empty submission falls back to it instead
-    // of hardcoded Mon-Fri 09:00-17:00.
+    // of the instance default availability.
     let _ = sqlx::query("DELETE FROM availability_rules WHERE event_type_id = ?")
         .bind(&et_id)
         .execute(&state.pool)

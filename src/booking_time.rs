@@ -95,10 +95,13 @@ pub fn encode(start: NaiveDateTime, tz: Tz, minutes: i32) -> Option<(String, Str
 }
 
 /// Resolve the configured zone; database failures must not masquerade as UTC.
+/// A missing or invalid zone falls back to the instance default, like `get_host_tz`.
 pub async fn event_timezone(pool: &SqlitePool, id: &str) -> Result<Tz, sqlx::Error> {
     let zone = sqlx::query_scalar::<_, Option<String>>("SELECT COALESCE(NULLIF(et.timezone, ''), u.timezone) FROM event_types et JOIN accounts a ON a.id = et.account_id LEFT JOIN users u ON u.id = a.user_id WHERE et.id = ?")
         .bind(id).fetch_optional(pool).await?.flatten();
-    Ok(zone.and_then(|tz| tz.parse().ok()).unwrap_or(Tz::UTC))
+    Ok(zone
+        .and_then(|tz| tz.parse().ok())
+        .unwrap_or_else(crate::defaults::timezone))
 }
 
 /// Frequency limits are calendar periods in the event timezone, not UTC days.

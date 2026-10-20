@@ -234,6 +234,21 @@
   var dayShort = [{{ t('slots-weekday-sun') | tojson }}, {{ t('slots-weekday-mon') | tojson }}, {{ t('slots-weekday-tue') | tojson }}, {{ t('slots-weekday-wed') | tojson }}, {{ t('slots-weekday-thu') | tojson }}, {{ t('slots-weekday-fri') | tojson }}, {{ t('slots-weekday-sat') | tojson }}];
   var schedule = {};
 
+  // Instance default availability (CALRS_DEFAULT_AVAILABILITY), else Mon-Fri 09:00-17:00.
+  var defaultScheduleStr = {{ default_avail_schedule | default('') | tojson }};
+  function defaultSchedule() {
+    var s = parseSchedule(defaultScheduleStr);
+    if (!Object.keys(s).length) {
+      for (var d = 1; d <= 5; d++) { s[d] = [{ start: '09:00', end: '17:00' }]; }
+    }
+    return s;
+  }
+  function defaultWindow() {
+    var s = defaultSchedule();
+    var w = s[Object.keys(s)[0]][0];
+    return { start: w.start, end: w.end };
+  }
+
   function parseSchedule(str) {
     var s = {};
     if (!str || !str.trim()) return s;
@@ -288,7 +303,7 @@
       toggle.style.cssText = 'accent-color:var(--accent);width:1rem;height:1rem;margin-top:0.3rem;cursor:pointer;flex-shrink:0;';
       toggle.addEventListener('change', (function(day) {
         return function() {
-          if (this.checked) { schedule[day] = [{ start: '09:00', end: '17:00' }]; }
+          if (this.checked) { schedule[day] = [defaultWindow()]; }
           else { delete schedule[day]; }
           renderSchedule(); serializeSchedule();
         };
@@ -319,7 +334,7 @@
             addBtn.type = 'button'; addBtn.textContent = '+'; addBtn.title = {{ t('settings-add-window') | tojson }};
             addBtn.style.cssText = 'padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text-muted);cursor:pointer;font-size:0.85rem;line-height:1;';
             addBtn.addEventListener('click', (function(day) {
-              return function() { schedule[day].push({ start: '09:00', end: '17:00' }); renderSchedule(); serializeSchedule(); };
+              return function() { schedule[day].push(defaultWindow()); renderSchedule(); serializeSchedule(); };
             })(d));
             winRow.appendChild(addBtn);
           }
@@ -355,7 +370,7 @@
   var savedSchedule = hidden.value.trim();
   if (savedSchedule) { schedule = parseSchedule(savedSchedule); }
   if (!Object.keys(schedule).length) {
-    for (var d = 1; d <= 5; d++) { schedule[d] = [{ start: '09:00', end: '17:00' }]; }
+    schedule = defaultSchedule();
   }
   renderSchedule();
   serializeSchedule();

@@ -153,8 +153,10 @@ cal.example.com {
 | `CALRS_EMAIL_BRAND_URL` | Where that footer name links to (http or https) | _(none)_ |
 | `CALRS_EMAIL_LOGO_URL` | Logo shown above the message in every HTML email (http or https; use PNG, mail clients rarely show SVG) | _(none)_ |
 | `CALRS_EMAIL_ACCENT` | Colour of the bar at the top of every HTML email, `#rrggbb` | per email type |
+| `CALRS_DEFAULT_TIMEZONE` | IANA timezone given to every new user (registration, SSO sign-up, `calrs user create`) and used when a host or event type has no valid timezone of its own, e.g. `Africa/Cairo`. Unset, empty or invalid means `UTC` (an invalid name logs one warning). Existing users keep theirs | `UTC` |
+| `CALRS_DEFAULT_AVAILABILITY` | Starting availability for new users and new event types, in the event-type schedule format `day:HH:MM-HH:MM[,HH:MM-HH:MM];...` with day `0` = Sunday, e.g. `0:10:00-17:00;1:10:00-17:00;2:10:00-17:00;3:10:00-17:00;4:10:00-17:00` for Sunday–Thursday 10:00–17:00. Unset, empty or invalid (an unknown day, a bad time, a start not before its end) means Monday–Friday 09:00–17:00 (an invalid value logs one warning). Existing schedules are not changed | Mon–Fri 09:00–17:00 |
 
-`CALRS_BASE_URL` and `CALRS_ALLOW_PRIVATE_HOSTS` can also be set without environment variables — from the admin panel (**System settings**) or the CLI (`calrs config general`). The stored value is persisted in the database; when the matching environment variable is set it takes precedence at runtime. The other variables (`CALRS_DATA_DIR`, `RUST_LOG`, and `CALRS_SECRET_KEY`) are bootstrap settings and remain environment-only.
+`CALRS_BASE_URL` and `CALRS_ALLOW_PRIVATE_HOSTS` can also be set without environment variables — from the admin panel (**System settings**) or the CLI (`calrs config general`). The stored value is persisted in the database; when the matching environment variable is set it takes precedence at runtime. The other variables (`CALRS_DATA_DIR`, `RUST_LOG`, and `CALRS_SECRET_KEY`) are bootstrap settings and remain environment-only. `CALRS_DEFAULT_TIMEZONE` and `CALRS_DEFAULT_AVAILABILITY` are environment-only too; restart calrs after changing them.
 
 ## Observability
 

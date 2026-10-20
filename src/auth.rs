@@ -462,7 +462,7 @@ pub(crate) async fn create_local_user(
 ) -> Result<String> {
     sqlx::query_scalar(
         "INSERT INTO users (id, email, name, timezone, password_hash, role, auth_provider, username)
-         VALUES (?, ?, ?, 'UTC', ?,
+         VALUES (?, ?, ?, ?, ?,
                  CASE WHEN ? OR NOT EXISTS (SELECT 1 FROM users) THEN 'admin' ELSE 'user' END,
                  'local', ?)
          RETURNING role",
@@ -470,6 +470,7 @@ pub(crate) async fn create_local_user(
     .bind(user_id)
     .bind(email)
     .bind(name)
+    .bind(crate::defaults::timezone_name())
     .bind(password_hash)
     .bind(force_admin)
     .bind(username)
@@ -948,11 +949,12 @@ async fn register_handler(
     } else {
         let account_id = uuid::Uuid::new_v4().to_string();
         let _ = sqlx::query(
-            "INSERT INTO accounts (id, name, email, timezone, user_id) VALUES (?, ?, ?, 'UTC', ?)",
+            "INSERT INTO accounts (id, name, email, timezone, user_id) VALUES (?, ?, ?, ?, ?)",
         )
         .bind(&account_id)
         .bind(&form.name)
         .bind(&form.email)
+        .bind(crate::defaults::timezone_name())
         .bind(&user_id)
         .execute(&state.pool)
         .await;
@@ -1480,13 +1482,14 @@ async fn find_or_create_oidc_user(
     // atomic with the row creation; see create_local_user for the rationale.
     sqlx::query(
         "INSERT INTO users (id, email, name, timezone, role, auth_provider, oidc_subject, username)
-         VALUES (?, ?, ?, 'UTC',
+         VALUES (?, ?, ?, ?,
                  CASE WHEN NOT EXISTS (SELECT 1 FROM users) THEN 'admin' ELSE 'user' END,
                  'oidc', ?, ?)",
     )
     .bind(&user_id)
     .bind(email)
     .bind(name)
+    .bind(crate::defaults::timezone_name())
     .bind(subject)
     .bind(&username)
     .execute(pool)
@@ -1509,11 +1512,12 @@ async fn find_or_create_oidc_user(
     } else {
         let account_id = uuid::Uuid::new_v4().to_string();
         sqlx::query(
-            "INSERT INTO accounts (id, name, email, timezone, user_id) VALUES (?, ?, ?, 'UTC', ?)",
+            "INSERT INTO accounts (id, name, email, timezone, user_id) VALUES (?, ?, ?, ?, ?)",
         )
         .bind(&account_id)
         .bind(name)
         .bind(email)
+        .bind(crate::defaults::timezone_name())
         .bind(&user_id)
         .execute(pool)
         .await?;
