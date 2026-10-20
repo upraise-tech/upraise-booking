@@ -12,6 +12,10 @@
 //! Every path that creates, approves, reschedules, declines or cancels a booking is covered without being touched,
 //! and a failed delivery is simply retried on the next pass. Pending requests are not sent until approved.
 //!
+//! Only sales meetings are sent: bookings of event types with `sales_meeting = 1` (the "Sales meeting" switch on the
+//! event type form). A booking that was already delivered keeps being reconciled after the switch is turned off, so
+//! its reschedule or cancellation still reaches the receiver.
+//!
 //! Requests are signed like Cal.com's: `X-Cal-Signature-256` = hex HMAC-SHA256 of the raw body with the shared secret.
 
 use chrono::{DateTime, Duration, NaiveDateTime, Utc};
@@ -78,6 +82,19 @@ pub async fn load_config(pool: &SqlitePool, secret_key: &[u8; 32]) -> Option<Con
         .and_then(|s| crate::crypto::decrypt_value(secret_key, &s).ok())
         .unwrap_or_default();
     Some(Config { url, secret })
+}
+
+/// Whether a destination is set, without decrypting the secret: the same test as `load_config(..).is_some()`.
+pub async fn is_configured(pool: &SqlitePool) -> bool {
+    sqlx::query_scalar::<_, Option<String>>(
+        "SELECT booking_events_url FROM auth_config WHERE id = 'singleton'",
+    )
+    .fetch_optional(pool)
+    .await
+    .ok()
+    .flatten()
+    .flatten()
+    .is_some_and(|u| !u.trim().is_empty())
 }
 
 /// A booking as the receiver needs it.
@@ -183,6 +200,7 @@ const CANDIDATES_SQL: &str = "
     LEFT JOIN users hu ON hu.id = b.assigned_user_id
     LEFT JOIN booking_event_deliveries d ON d.booking_id = b.id
     WHERE b.time_version = 1 AND b.end_at >= ?
+      AND (et.sales_meeting = 1 OR d.booking_id IS NOT NULL)
     ORDER BY b.start_at";
 
 /// One pass: send every event due. Called once a minute; does nothing when the feature is off.

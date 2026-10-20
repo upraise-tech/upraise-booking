@@ -257,6 +257,15 @@ pub(super) async fn dashboard_event_types(
             .unwrap_or_default()
     };
 
+    // Event types marked as sales meetings, for the "Sales" badge.
+    let sales_ids: std::collections::HashSet<String> =
+        sqlx::query_scalar::<_, String>("SELECT id FROM event_types WHERE sales_meeting = 1")
+            .fetch_all(&state.pool)
+            .await
+            .unwrap_or_default()
+            .into_iter()
+            .collect();
+
     // Build a single unified list: personal event types first, then team ones
     let mut all_et_ctx: Vec<minijinja::Value> = Vec::new();
 
@@ -272,6 +281,7 @@ pub(super) async fn dashboard_event_types(
             overrides_url => format!("/dashboard/event-types/{}/overrides", slug),
             embed_url => format!("/dashboard/event-types/{}/embed", slug),
             resource_names => resource_names_for(id),
+            sales_meeting => sales_ids.contains(id.as_str()),
             view_url => if vis != "private" { user.username.as_ref().map(|u| format!("/u/{}/{}", u, slug)) } else { None::<String> },
         });
     }
@@ -302,6 +312,7 @@ pub(super) async fn dashboard_event_types(
             embed_url => format!("/dashboard/group-event-types/{}/{}/embed", team_id, slug),
             overrides_url => format!("/dashboard/event-types/{}/overrides", slug),
             resource_names => resource_names_for(id),
+            sales_meeting => sales_ids.contains(id.as_str()),
             // Team event types always get a view link — logged-in team members
             // can view private/internal slots without an invite token.
             view_url => Some(format!("/team/{}/{}", team_slug, slug)),

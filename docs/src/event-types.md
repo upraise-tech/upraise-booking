@@ -82,6 +82,12 @@ Each event type decides whether the booking form asks the guest for a phone numb
 
 The setting only appears when an SMS gateway is configured for the instance and you are permitted to change it: by default that means global admins only. See [SMS Notifications](./sms.md).
 
+## Sales meeting
+
+When [Booking events](./admin.md#booking-events-upraise-outreach) is configured, the first card of the event type form has a **Sales meeting** switch. Bookings of an event type with it on go to Upraise Outreach and the notetaker; leave it off for internal meetings. It is off on every new event type, personal and team alike, and anyone who can edit the event type can change it. The event types list shows a **Sales** badge on event types with the switch on.
+
+Turning the switch off stops new bookings of that event type from being sent. A booking that was already sent keeps being followed, so if it is later moved or cancelled, Upraise Outreach still hears about it.
+
 ## Availability schedule
 
 Each event type has its own availability rules. By default: Monday–Friday, 09:00–17:00.
