@@ -57,7 +57,34 @@ pub(super) fn render_html_email_in(
     footer_note: Option<&str>,
     actions: &[EmailAction],
 ) -> String {
-    let sent_by = h(&t(lang, "email-footer-sent-by"));
+    let brand = EmailBrand::from_env();
+    let accent = brand.accent.as_deref().unwrap_or(accent);
+    let footer_line = match &brand.name {
+        Some(name) => match &brand.url {
+            Some(url) => format!(
+                "<a href=\"{}\" style=\"font-size:12px;color:#6b7280;font-weight:600;text-decoration:none;\">{}</a>",
+                h(url),
+                h(name)
+            ),
+            None => format!(
+                "<span style=\"font-size:12px;color:#6b7280;font-weight:600;\">{}</span>",
+                h(name)
+            ),
+        },
+        None => format!(
+            "<span style=\"font-size:12px;color:#9ca3af;\">{} </span>\
+             <a href=\"https://cal.rs\" style=\"font-size:12px;color:#6b7280;font-weight:600;text-decoration:none;\">calrs</a>",
+            h(&t(lang, "email-footer-sent-by"))
+        ),
+    };
+    let logo_row = match &brand.logo_url {
+        Some(logo) => format!(
+            "<tr><td style=\"padding:24px 28px 0;\"><img src=\"{}\" alt=\"{}\" height=\"32\" style=\"display:block;height:32px;width:auto;border:0;\"></td></tr>",
+            h(logo),
+            h(brand.name.as_deref().unwrap_or(""))
+        ),
+        None => String::new(),
+    };
     let lang = h(crate::i18n::html_lang(lang));
     let mut detail_rows = String::new();
     for (i, row) in rows.iter().enumerate() {
@@ -105,6 +132,7 @@ pub(super) fn render_html_email_in(
   <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;max-width:520px;width:100%;">
     <!-- Accent bar -->
     <tr><td style="height:4px;background:{accent};border-radius:8px 8px 0 0;"></td></tr>
+    {logo_row}
     <!-- Content -->
     <tr><td style="padding:32px 28px;">
       <p style="margin:0 0 4px;font-size:15px;color:#374151;">{greeting}</p>
@@ -118,8 +146,7 @@ pub(super) fn render_html_email_in(
     </td></tr>
     <!-- Footer -->
     <tr><td style="padding:16px 28px;border-top:1px solid #f0f0f3;text-align:center;">
-      <span style="font-size:12px;color:#9ca3af;">{sent_by} </span>
-      <a href="https://cal.rs" style="font-size:12px;color:#6b7280;font-weight:600;text-decoration:none;">calrs</a>
+      {footer_line}
     </td></tr>
   </table>
 </td></tr>
@@ -127,6 +154,39 @@ pub(super) fn render_html_email_in(
 </body>
 </html>"##
     )
+}
+
+/// Optional branding for the HTML emails, from the environment, so an organisation can send them under
+/// its own name: `CALRS_EMAIL_BRAND_NAME` (footer, replaces "Sent by calrs"), `CALRS_EMAIL_BRAND_URL`
+/// (the footer links there), `CALRS_EMAIL_LOGO_URL` (a logo above the message; use a PNG, mail
+/// clients rarely show SVG) and `CALRS_EMAIL_ACCENT` (the colour bar, `#rrggbb`). Each is optional.
+pub(super) struct EmailBrand {
+    pub(super) name: Option<String>,
+    pub(super) url: Option<String>,
+    pub(super) logo_url: Option<String>,
+    pub(super) accent: Option<String>,
+}
+
+impl EmailBrand {
+    pub(super) fn from_env() -> Self {
+        let var = |k: &str| {
+            std::env::var(k)
+                .ok()
+                .map(|v| v.trim().to_string())
+                .filter(|v| !v.is_empty())
+        };
+        let web = |v: String| (v.starts_with("https://") || v.starts_with("http://")).then_some(v);
+        let colour = |v: String| {
+            let hex = v.strip_prefix('#')?;
+            (hex.len() == 6 && hex.chars().all(|c| c.is_ascii_hexdigit())).then_some(v)
+        };
+        Self {
+            name: var("CALRS_EMAIL_BRAND_NAME"),
+            url: var("CALRS_EMAIL_BRAND_URL").and_then(web),
+            logo_url: var("CALRS_EMAIL_LOGO_URL").and_then(web),
+            accent: var("CALRS_EMAIL_ACCENT").and_then(colour),
+        }
+    }
 }
 
 pub(super) fn build_multipart_body(plain: &str, html: &str) -> MultiPart {

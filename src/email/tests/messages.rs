@@ -1306,8 +1306,11 @@ fn host_in(lang: Option<&str>) -> BookingDetails {
     }
 }
 
-#[test]
-fn host_notification_is_written_in_the_host_language() {
+#[tokio::test]
+async fn host_notification_is_written_in_the_host_language() {
+    // The footer reads CALRS_EMAIL_BRAND_NAME; hold the shared lock so a branding test can't change it.
+    let _env = crate::test_support::ENV_LOCK.lock().await;
+    let _vars = crate::test_support::EnvGuard::new();
     let mail = compose_host_notification(&host_in(Some("de")));
     assert_eq!(
         mail.subject,
@@ -1329,8 +1332,11 @@ fn host_notification_is_written_in_the_host_language() {
     );
 }
 
-#[test]
-fn host_notification_without_a_language_is_english() {
+#[tokio::test]
+async fn host_notification_without_a_language_is_english() {
+    // The footer reads CALRS_EMAIL_BRAND_NAME; hold the shared lock so a branding test can't change it.
+    let _env = crate::test_support::ENV_LOCK.lock().await;
+    let _vars = crate::test_support::EnvGuard::new();
     for lang in [None, Some(""), Some("xx")] {
         let mail = compose_host_notification(&host_in(lang));
         assert_eq!(
