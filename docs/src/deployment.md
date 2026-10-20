@@ -148,6 +148,11 @@ cal.example.com {
 | `CALRS_ALLOW_PRIVATE_HOSTS` | Comma-separated hostnames allowed to resolve to private IPs for CalDAV/EWS (SSRF opt-out) | _(none)_ |
 | `RUST_LOG` | Log level filter | `calrs=info,tower_http=info` |
 | `CALRS_SMS_*` | SMS gateway configuration, overriding the admin panel; see [SMS Notifications](./sms.md#environment-variables) | _(none)_ |
+| `CALRS_OIDC_AUTO_REDIRECT` | `true`: the login page starts the SSO sign-in by itself (see [Authentication](./authentication.md)) | `false` |
+| `CALRS_EMAIL_BRAND_NAME` | Name shown in the footer of every HTML email, instead of "Sent by calrs" | _(none)_ |
+| `CALRS_EMAIL_BRAND_URL` | Where that footer name links to (http or https) | _(none)_ |
+| `CALRS_EMAIL_LOGO_URL` | Logo shown above the message in every HTML email (http or https; use PNG, mail clients rarely show SVG) | _(none)_ |
+| `CALRS_EMAIL_ACCENT` | Colour of the bar at the top of every HTML email, `#rrggbb` | per email type |
 
 `CALRS_BASE_URL` and `CALRS_ALLOW_PRIVATE_HOSTS` can also be set without environment variables — from the admin panel (**System settings**) or the CLI (`calrs config general`). The stored value is persisted in the database; when the matching environment variable is set it takes precedence at runtime. The other variables (`CALRS_DATA_DIR`, `RUST_LOG`, and `CALRS_SECRET_KEY`) are bootstrap settings and remain environment-only.
 

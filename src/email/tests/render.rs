@@ -1909,3 +1909,37 @@ fn html_email_has_calrs_footer_link() {
     assert!(html.contains("https://cal.rs"));
     assert!(html.contains("calrs"));
 }
+
+#[tokio::test]
+async fn emails_carry_the_configured_brand_instead_of_calrs() {
+    let _env = crate::test_support::ENV_LOCK.lock().await;
+    let _vars = crate::test_support::EnvGuard::new();
+
+    let plain = render_html_email_in("en", "Hi", "Booked", "#111111", &[], None, &[]);
+    assert!(
+        plain.contains("https://cal.rs"),
+        "default footer names calrs"
+    );
+
+    std::env::set_var("CALRS_EMAIL_BRAND_NAME", "Upraise");
+    std::env::set_var("CALRS_EMAIL_BRAND_URL", "https://upraiseseo.com");
+    std::env::set_var(
+        "CALRS_EMAIL_LOGO_URL",
+        "https://hub.upraise.uk/static/logo-navy.png",
+    );
+    std::env::set_var("CALRS_EMAIL_ACCENT", "#4f54e3");
+    let branded = render_html_email_in("en", "Hi", "Booked", "#111111", &[], None, &[]);
+    assert!(
+        !branded.contains("cal.rs") && !branded.contains("calrs"),
+        "no calrs left: {branded}"
+    );
+    assert!(branded.contains("https://upraiseseo.com") && branded.contains(">Upraise</a>"));
+    assert!(branded.contains("https://hub.upraise.uk/static/logo-navy.png"));
+    assert!(branded.contains("background:#4f54e3") && !branded.contains("#111111"));
+
+    // Values that are not a web address or a colour are ignored rather than written into the email.
+    std::env::set_var("CALRS_EMAIL_BRAND_URL", "javascript:alert(1)");
+    std::env::set_var("CALRS_EMAIL_ACCENT", "red;x:y");
+    let guarded = render_html_email_in("en", "Hi", "Booked", "#111111", &[], None, &[]);
+    assert!(!guarded.contains("javascript:") && guarded.contains("background:#111111"));
+}
