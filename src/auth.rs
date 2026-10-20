@@ -648,10 +648,36 @@ pub struct RegisterForm {
     pub password: String,
 }
 
+/// Set for a minute when the login page hands over to SSO, so a failed SSO round trip shows the
+/// page instead of looping.
+const SSO_TRY_COOKIE: &str = "calrs_sso_try";
+/// Set by signing out, for the rest of the browser session, so the login page stays put instead of
+/// signing straight back in through SSO.
+const SIGNED_OUT_COOKIE: &str = "calrs_signed_out";
+
+/// `CALRS_OIDC_AUTO_REDIRECT=true`: when OIDC is enabled, the login page starts the SSO sign-in by
+/// itself, for deployments where the identity provider is the only way in. `/auth/login?local=1`
+/// still shows the form.
+fn oidc_auto_redirect() -> bool {
+    matches!(
+        std::env::var("CALRS_OIDC_AUTO_REDIRECT")
+            .unwrap_or_default()
+            .to_ascii_lowercase()
+            .as_str(),
+        "1" | "true" | "yes"
+    )
+}
+
+#[derive(Deserialize, Default)]
+struct LoginPageQuery {
+    local: Option<String>,
+}
+
 async fn login_page(
     State(state): State<Arc<AppState>>,
     headers: HeaderMap,
     jar: CookieJar,
+    Query(query): Query<LoginPageQuery>,
 ) -> Response {
     // If already authenticated, redirect to dashboard
     if let Some(token) = jar.get(SESSION_COOKIE).map(|c| c.value().to_string()) {
@@ -669,6 +695,21 @@ async fn login_page(
         .as_ref()
         .map(|c| c.registration_enabled)
         .unwrap_or(true);
+
+    if oidc_enabled
+        && oidc_auto_redirect()
+        && query.local.as_deref() != Some("1")
+        && jar.get(SSO_TRY_COOKIE).is_none()
+        && jar.get(SIGNED_OUT_COOKIE).is_none()
+    {
+        let try_cookie =
+            format!("{SSO_TRY_COOKIE}=1; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=60");
+        return (
+            [("Set-Cookie", try_cookie)],
+            Redirect::to("/auth/oidc/login"),
+        )
+            .into_response();
+    }
 
     let csrf_token = generate_csrf_token();
 
@@ -954,8 +995,15 @@ async fn logout_handler(
         "{}=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
         SESSION_COOKIE
     );
+    let signed_out = format!("{SIGNED_OUT_COOKIE}=1; HttpOnly; Secure; SameSite=Lax; Path=/");
 
-    ([("Set-Cookie", clear_cookie)], Redirect::to("/auth/login")).into_response()
+    let mut headers = axum::http::HeaderMap::new();
+    headers.append(
+        axum::http::header::SET_COOKIE,
+        clear_cookie.parse().unwrap(),
+    );
+    headers.append(axum::http::header::SET_COOKIE, signed_out.parse().unwrap());
+    (headers, Redirect::to("/auth/login")).into_response()
 }
 
 // --- OIDC ---
@@ -1323,6 +1371,13 @@ async fn oidc_callback(
     headers.append(axum::http::header::SET_COOKIE, clear_state.parse().unwrap());
     headers.append(axum::http::header::SET_COOKIE, clear_nonce.parse().unwrap());
     headers.append(axum::http::header::SET_COOKIE, clear_pkce.parse().unwrap());
+    let clear_try = format!("{SSO_TRY_COOKIE}={clear}");
+    let clear_signed_out = format!("{SIGNED_OUT_COOKIE}={clear}");
+    headers.append(axum::http::header::SET_COOKIE, clear_try.parse().unwrap());
+    headers.append(
+        axum::http::header::SET_COOKIE,
+        clear_signed_out.parse().unwrap(),
+    );
 
     (headers, Redirect::to("/dashboard")).into_response()
 }

@@ -245,3 +245,49 @@ async fn register_creates_user() {
             .unwrap();
     assert_eq!(count.0, 1, "User should be created");
 }
+
+#[tokio::test]
+async fn login_page_hands_over_to_sso_when_auto_redirect_is_on() {
+    let _env = crate::test_support::ENV_LOCK.lock().await;
+    let _vars = crate::test_support::EnvGuard::new();
+    let (app, pool, _, _) = setup_test_app().await;
+    sqlx::query("UPDATE auth_config SET oidc_enabled = 1 WHERE id = 'singleton'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    std::env::set_var("CALRS_OIDC_AUTO_REDIRECT", "true");
+
+    let to_sso = app.clone().oneshot(get("/auth/login")).await.unwrap();
+    assert_eq!(to_sso.status(), 303);
+    assert_eq!(
+        to_sso.headers().get("location").unwrap().to_str().unwrap(),
+        "/auth/oidc/login"
+    );
+    let cookie = to_sso
+        .headers()
+        .get("set-cookie")
+        .unwrap()
+        .to_str()
+        .unwrap();
+    assert!(
+        cookie.starts_with("calrs_sso_try=1"),
+        "loop guard cookie: {cookie}"
+    );
+
+    // The form stays reachable, a failed attempt doesn't loop, and signing out sticks.
+    let local = app
+        .clone()
+        .oneshot(get("/auth/login?local=1"))
+        .await
+        .unwrap();
+    assert_eq!(local.status(), 200);
+    for cookie in ["calrs_sso_try=1", "calrs_signed_out=1"] {
+        let req = axum::http::Request::builder()
+            .uri("/auth/login")
+            .header("cookie", cookie)
+            .body(axum::body::Body::empty())
+            .unwrap();
+        let response = app.clone().oneshot(req).await.unwrap();
+        assert_eq!(response.status(), 200, "with {cookie}");
+    }
+}

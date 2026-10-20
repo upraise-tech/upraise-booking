@@ -85,6 +85,14 @@ Or from the **Admin dashboard > OIDC** section.
 
 The login page will show a **"Sign in with SSO"** button when OIDC is enabled.
 
+### Sign straight in with SSO
+
+When the identity provider is the only way your team signs in, set `CALRS_OIDC_AUTO_REDIRECT=true`. The login page then starts the SSO sign-in by itself, so someone already signed in to the provider lands on their dashboard without seeing the login page.
+
+- `/auth/login?local=1` still shows the form, for a local admin account.
+- If the SSO round trip fails, the login page shows normally for the next minute instead of trying again, so it can never loop.
+- After **Sign out**, the login page stays put for the rest of that browser session instead of signing straight back in.
+
 ## User roles
 
 | Role | Capabilities |
