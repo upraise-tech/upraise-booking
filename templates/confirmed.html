@@ -64,4 +64,5 @@
   });
 })();
 </script>
+{% set ga_path = tracking_path | default("") %}{% set ga_booked = true %}{% set ga_pending = pending %}{% include "_ga4.html" %}
 {% endblock %}

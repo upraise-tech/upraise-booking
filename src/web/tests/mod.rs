@@ -16,6 +16,7 @@ mod dashboard;
 mod emails;
 mod event_types;
 mod format;
+mod ga4;
 mod guards;
 mod hosts;
 mod invites;

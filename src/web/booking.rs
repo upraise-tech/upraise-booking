@@ -839,6 +839,7 @@ pub(super) async fn handle_group_booking(
     let rendered = tmpl
         .render(context! {
             event_title => et_title,
+            tracking_path => format!("/team/{}/{}", team_slug, slug),
             date_label => date_label,
             time_start => form.time,
             time_end => guest_end_time,
@@ -1997,6 +1998,7 @@ pub(super) async fn handle_booking_for_user(
     let rendered = tmpl
         .render(context! {
             event_title => et_title,
+            tracking_path => format!("/u/{}/{}", username, slug),
             date_label => date_label,
             time_start => form.time,
             time_end => guest_end_time,
