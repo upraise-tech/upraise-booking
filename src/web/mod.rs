@@ -9,6 +9,7 @@ pub mod captcha;
 mod dashboard;
 mod event_types;
 mod format;
+pub mod ga4;
 mod hosts;
 mod invites;
 pub mod meeting;
@@ -147,6 +148,9 @@ pub struct AppState {
     /// Strict baseline CSP served on every non-booking page regardless of
     /// captcha configuration.
     pub csp_baseline: String,
+    /// Google Analytics on chosen public booking pages (CALRS_GA4_*), read
+    /// once at startup. None means no page loads it.
+    pub ga4: Option<ga4::Ga4Config>,
 }
 
 // --- CSRF protection (double-submit cookie pattern) ---
@@ -515,6 +519,7 @@ async fn csp_middleware(
     next: axum::middleware::Next,
 ) -> axum::response::Response {
     let booking_page = is_booking_form_path(request.uri().path());
+    let path = request.uri().path().to_string();
     let embed_mode = is_embedded_booking_request(request.uri().path(), request.uri().query());
     let mut response = next.run(request).await;
     if !response
@@ -535,6 +540,11 @@ async fn csp_middleware(
         } else {
             strict
         };
+        // The Google tag's origins, only on the event types it is enabled for.
+        let csp = match state.ga4.as_ref() {
+            Some(g) if g.tracks(&path) => ga4::extend_csp(&csp),
+            _ => csp,
+        };
         if let Ok(val) = axum::http::HeaderValue::from_str(&csp) {
             response
                 .headers_mut()
@@ -551,6 +561,15 @@ pub async fn create_router(pool: SqlitePool, data_dir: PathBuf, secret_key: [u8;
     crate::i18n::register(&mut env);
     // The schedule editors' client-side default (CALRS_DEFAULT_AVAILABILITY),
     // read once at startup like the rest of the process environment.
+    // Google Analytics on chosen booking pages (CALRS_GA4_*); templates/_ga4.html.
+    let ga4_config = ga4::Ga4Config::from_env();
+    if let Some(g) = ga4_config.as_ref() {
+        env.add_global("ga4", minijinja::Value::from_serialize(g));
+        tracing::info!(
+            pages = g.pages.len(),
+            "Google Analytics enabled on chosen booking pages"
+        );
+    }
     env.add_global(
         "default_avail_schedule",
         crate::defaults::availability_string(),
@@ -580,6 +599,7 @@ pub async fn create_router(pool: SqlitePool, data_dir: PathBuf, secret_key: [u8;
         meeting_config: tokio::sync::RwLock::new(initial_meeting),
         csp: tokio::sync::RwLock::new(initial_csp),
         csp_baseline: build_csp(&None),
+        ga4: ga4_config,
     });
 
     Router::new()
