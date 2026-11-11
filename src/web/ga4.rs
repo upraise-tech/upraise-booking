@@ -134,12 +134,14 @@ impl Ga4Config {
     }
 }
 
-/// The CSP with the origins the Google tag needs (Google's documented list for
-/// GA4) added to `script-src`, `img-src` and `connect-src`.
+/// The CSP with the origins the Google tag sends to added to `script-src`,
+/// `img-src` and `connect-src`: Google's documented list for GA4, plus the
+/// Google signals endpoints (`*.g.doubleclick.net`, `www.google.com`) and the
+/// bare `analytics.google.com`, which `*.analytics.google.com` does not cover.
 pub fn extend_csp(csp: &str) -> String {
     const SCRIPT: &str = " https://*.googletagmanager.com";
-    const IMG: &str = " https://*.google-analytics.com https://*.googletagmanager.com";
-    const CONNECT: &str = " https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com";
+    const IMG: &str = " https://*.google-analytics.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com";
+    const CONNECT: &str = " https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com";
     csp.split(';')
         .map(|d| {
             let t = d.trim();
@@ -210,16 +212,44 @@ mod tests {
         assert!(!c.tracks("/dashboard"));
     }
 
+    // CSP host-source matching, enough for these sources: exact, or "*." for any subdomain.
+    fn allows(src: &str, host: &str) -> bool {
+        match src.strip_prefix("https://*.") {
+            Some(base) => host
+                .strip_prefix("https://")
+                .is_some_and(|h| h.ends_with(&format!(".{base}"))),
+            None => src == host,
+        }
+    }
+
     #[test]
     fn csp_gains_google_origins_only_where_needed() {
         let base = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; \
                     script-src 'self' 'unsafe-inline'; connect-src 'self'; object-src 'none'";
         let out = extend_csp(base);
         assert!(out.contains("script-src 'self' 'unsafe-inline' https://*.googletagmanager.com;"));
-        assert!(out.contains(
-            "img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com;"
-        ));
-        assert!(out.contains("connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com;"));
+        assert!(out.contains("img-src 'self' data: https://*.google-analytics.com https://*.googletagmanager.com https://*.g.doubleclick.net https://*.google.com;"));
+        // Every host gtag.js was seen sending to from book.upraise.uk.
+        let connect = out
+            .split("; ")
+            .find(|d| d.starts_with("connect-src"))
+            .unwrap();
+        for host in [
+            "https://analytics.google.com",
+            "https://region1.analytics.google.com",
+            "https://region1.google-analytics.com",
+            "https://www.google.com",
+            "https://stats.g.doubleclick.net",
+            "https://www.googletagmanager.com",
+        ] {
+            assert!(
+                connect.split(' ').skip(1).any(|src| allows(src, host)),
+                "{host} blocked"
+            );
+        }
+        assert!(!connect
+            .split(' ')
+            .any(|src| allows(src, "https://evil.example")));
         assert!(out.contains("default-src 'self'; ") && out.ends_with("object-src 'none'"));
         assert!(!out.contains("style-src 'self' 'unsafe-inline' https"));
     }
